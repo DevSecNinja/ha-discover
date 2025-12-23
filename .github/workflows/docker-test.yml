@@ -63,25 +63,25 @@ jobs:
           echo "Testing API endpoints..."
           
           # Test root endpoint
-          response=$(curl -s http://localhost:8000/)
-          echo "Root endpoint response: $response"
-          if ! echo "$response" | grep -q "HA Discover API"; then
+          root_response=$(curl -s http://localhost:8000/)
+          echo "Root endpoint response: $root_response"
+          if ! echo "$root_response" | grep -q "HA Discover API"; then
             echo "✗ Root endpoint test failed"
             exit 1
           fi
           echo "✓ Root endpoint works"
           
           # Test health endpoint
-          response=$(curl -s http://localhost:8000/api/v1/health)
-          echo "Health endpoint response: $response"
-          if ! echo "$response" | grep -q "healthy"; then
+          health_response=$(curl -s http://localhost:8000/api/v1/health)
+          echo "Health endpoint response: $health_response"
+          if ! echo "$health_response" | grep -q "healthy"; then
             echo "✗ Health endpoint test failed"
             exit 1
           fi
           echo "✓ Health endpoint works"
           
           # Test version in root endpoint
-          if ! echo "$response" | grep -q "version"; then
+          if ! echo "$root_response" | grep -q "version"; then
             echo "✗ Version field not found in root endpoint"
             exit 1
           fi
