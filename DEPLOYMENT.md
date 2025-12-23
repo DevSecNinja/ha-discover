@@ -2,6 +2,20 @@
 
 This document explains how to deploy the HA Discover frontend to GitHub Pages.
 
+## ⚠️ Prerequisites
+
+**Before deploying the frontend, you must first deploy the backend API.** GitHub Pages only hosts static files and cannot run the Python backend.
+
+👉 **See [BACKEND_DEPLOYMENT.md](./BACKEND_DEPLOYMENT.md) for backend deployment instructions.**
+
+## Quick Start
+
+1. **Deploy backend** (see [BACKEND_DEPLOYMENT.md](./BACKEND_DEPLOYMENT.md))
+2. **Get backend URL** (e.g., `https://your-app.railway.app`)
+3. **Configure API URL** (see [Configure API URL](#2-configure-api-url) below)
+4. **Enable GitHub Pages** (see [Enable GitHub Pages](#1-enable-github-pages) below)
+5. **Push to main** to trigger deployment
+
 ## Configuration
 
 The frontend is configured for static export to GitHub Pages with the following settings:
@@ -140,12 +154,20 @@ This will serve the static files on `http://localhost:3000`.
 
 ## Backend Deployment
 
-**Note**: GitHub Pages only hosts static frontend files. You'll need to deploy the backend API separately to a service like:
+**Important**: GitHub Pages only hosts static frontend files. You must deploy the backend API separately to a hosting service.
 
-- Heroku
-- Railway
-- Render
-- AWS/Azure/GCP
-- Your own server
+For detailed backend deployment instructions, see **[BACKEND_DEPLOYMENT.md](./BACKEND_DEPLOYMENT.md)**.
 
-Update the `NEXT_PUBLIC_API_URL` in the workflow to point to your deployed backend.
+### Quick Backend Deployment Options
+
+The backend can be deployed to:
+
+- **Docker** - Self-hosted or cloud deployment
+
+After deploying your backend:
+
+1. Get your backend URL (e.g., `https://your-app.railway.app`)
+2. Update the `NEXT_PUBLIC_API_URL` in `.github/workflows/deploy.yml` (see below)
+3. Push changes to trigger frontend deployment
+
+See **[BACKEND_DEPLOYMENT.md](./BACKEND_DEPLOYMENT.md)** for step-by-step instructions.

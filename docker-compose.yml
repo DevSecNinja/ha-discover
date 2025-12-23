@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  api:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      # Optional: Add your GitHub token for higher API rate limits
+      - GITHUB_TOKEN=${GITHUB_TOKEN:-}
+    volumes:
+      # Persist database across container restarts
+      - api_data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+volumes:
+  api_data:
+  

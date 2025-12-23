@@ -8,6 +8,8 @@ HA Discover indexes Home Assistant automation files from GitHub repositories tha
 
 Think of it as a specialized search engine for Home Assistant configurations—similar to how kubesearch.dev works for Kubernetes resources, but focused specifically on Home Assistant automations.
 
+[Try it out now!](https://devsecninja.github.io/ha-discover/)
+
 ## Why HA Discover?
 
 Home Assistant users often create sophisticated automations and share them on GitHub, but discovering these automations can be challenging. HA Discover solves this by:
@@ -145,22 +147,6 @@ All tests should pass. The test suite includes:
 ## Architecture
 
 For detailed information about the system architecture, data flow, and design decisions, see [ARCHITECTURE.md](./ARCHITECTURE.md).
-
-## Deployment
-
-### GitHub Pages Deployment
-
-The frontend can be deployed to GitHub Pages for free hosting. See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions.
-
-**Quick steps:**
-
-1. Enable GitHub Pages in repository settings (Source: GitHub Actions)
-2. Update the API URL in `.github/workflows/deploy.yml`
-3. Push to `main` branch or manually trigger the workflow
-4. Backend tests run automatically before deployment
-5. Access your site at `https://<username>.github.io/<repository>/`
-
-**Note**: You'll need to deploy the backend API separately to a hosting service (Heroku, Railway, Render, etc.) and configure the API URL in the deployment workflow. The deployment workflow runs all backend tests before deploying to ensure code quality.
 
 ## Contributing
 
