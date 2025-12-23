@@ -1,21 +1,55 @@
 """Tests for ROOT_PATH environment variable configuration."""
 import os
 import importlib
+import pytest
+import sys
 from fastapi.testclient import TestClient
 
 
-def test_endpoints_with_root_path_set():
-    """Test that endpoints work correctly when ROOT_PATH is set to /api/v1."""
-    # Set ROOT_PATH environment variable
+@pytest.fixture
+def app_with_root_path():
+    """Fixture that provides an app instance with ROOT_PATH set."""
     os.environ["ROOT_PATH"] = "/api/v1"
     
-    # Reload the main module to pick up the environment variable
-    import app.main
-    importlib.reload(app.main)
+    # Reload the app.main module
+    if 'app.main' in sys.modules:
+        importlib.reload(sys.modules['app.main'])
+    else:
+        import app.main
     
-    from app.main import app as root_path_app
+    from app.main import app
+    yield app
     
-    client = TestClient(root_path_app)
+    # Cleanup
+    if "ROOT_PATH" in os.environ:
+        del os.environ["ROOT_PATH"]
+    if 'app.main' in sys.modules:
+        importlib.reload(sys.modules['app.main'])
+
+
+@pytest.fixture
+def app_without_root_path():
+    """Fixture that provides an app instance without ROOT_PATH set."""
+    if "ROOT_PATH" in os.environ:
+        del os.environ["ROOT_PATH"]
+    
+    # Reload the app.main module
+    if 'app.main' in sys.modules:
+        importlib.reload(sys.modules['app.main'])
+    else:
+        import app.main
+    
+    from app.main import app
+    yield app
+    
+    # Cleanup
+    if 'app.main' in sys.modules:
+        importlib.reload(sys.modules['app.main'])
+
+
+def test_endpoints_with_root_path_set(app_with_root_path):
+    """Test that endpoints work correctly when ROOT_PATH is set to /api/v1."""
+    client = TestClient(app_with_root_path)
     
     # When ROOT_PATH=/api/v1, endpoints should be accessible without the prefix
     response = client.get("/health")
@@ -34,25 +68,11 @@ def test_endpoints_with_root_path_set():
     assert "query" in data
     assert "results" in data
     assert "count" in data
-    
-    # Clean up: remove ROOT_PATH and reload module
-    del os.environ["ROOT_PATH"]
-    importlib.reload(app.main)
 
 
-def test_endpoints_without_root_path():
+def test_endpoints_without_root_path(app_without_root_path):
     """Test that endpoints work correctly when ROOT_PATH is not set (default behavior)."""
-    # Ensure ROOT_PATH is not set
-    if "ROOT_PATH" in os.environ:
-        del os.environ["ROOT_PATH"]
-    
-    # Reload the main module
-    import app.main
-    importlib.reload(app.main)
-    
-    from app.main import app as default_app
-    
-    client = TestClient(default_app)
+    client = TestClient(app_without_root_path)
     
     # Without ROOT_PATH, endpoints should require /api/v1 prefix
     response = client.get("/api/v1/health")
@@ -74,23 +94,11 @@ def test_endpoints_without_root_path():
     # Without prefix should fail
     response = client.get("/health")
     assert response.status_code == 404
-    
-    # Clean up
-    importlib.reload(app.main)
 
 
-def test_openapi_schema_with_root_path():
+def test_openapi_schema_with_root_path(app_with_root_path):
     """Test that OpenAPI schema includes correct server URL when ROOT_PATH is set."""
-    # Set ROOT_PATH environment variable
-    os.environ["ROOT_PATH"] = "/api/v1"
-    
-    # Reload the main module
-    import app.main
-    importlib.reload(app.main)
-    
-    from app.main import app as root_path_app
-    
-    client = TestClient(root_path_app)
+    client = TestClient(app_with_root_path)
     
     response = client.get("/openapi.json")
     assert response.status_code == 200
@@ -100,7 +108,5 @@ def test_openapi_schema_with_root_path():
     assert len(openapi_schema["servers"]) > 0
     # Check that the root_path is reflected in the server URL
     assert openapi_schema["servers"][0]["url"] == "/api/v1"
-    
-    # Clean up
-    del os.environ["ROOT_PATH"]
-    importlib.reload(app.main)
+
+
