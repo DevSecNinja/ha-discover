@@ -278,11 +278,20 @@ The API follows REST conventions:
 
 #### `POST /api/v1/index`
 
-**Response:**
+**Rate Limiting:** Once every 10 minutes
+
+**Success Response (200):**
 ```json
 {
   "message": "Indexing started in background",
   "started": true
+}
+```
+
+**Rate Limit Response (429):**
+```json
+{
+  "detail": "Indexing rate limit exceeded. Please wait 9m 45s before triggering again."
 }
 ```
 
@@ -376,6 +385,18 @@ This enables local development with separate backend/frontend servers.
 - Independent deployment possible
 - Different tech stacks don't interfere
 - Standard pattern for full-stack apps
+
+### 9. Rate Limiting on Indexing
+
+**Decision:** Limit re-indexing to once every 10 minutes
+
+**Rationale:**
+- Prevents API abuse and excessive GitHub API calls
+- Reduces server load
+- GitHub API has rate limits that need to be respected
+- 10-minute cooldown is reasonable for discovery of new repositories
+- In-memory tracking sufficient for MVP (single server)
+- Returns HTTP 429 with clear error message including wait time
 
 ## Future Enhancements
 

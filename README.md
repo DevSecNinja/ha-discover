@@ -123,7 +123,7 @@ The backend API is documented with OpenAPI/Swagger. Once the backend is running,
 
 - `GET /api/v1/search?q={query}` - Search for automations
 - `GET /api/v1/statistics` - Get indexing statistics
-- `POST /api/v1/index` - Trigger repository indexing
+- `POST /api/v1/index` - Trigger repository indexing (rate limited to once per 10 minutes)
 - `GET /api/v1/health` - Health check
 
 ## Testing

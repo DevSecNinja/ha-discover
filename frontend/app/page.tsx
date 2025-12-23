@@ -86,9 +86,17 @@ export default function Home() {
       const response = await fetch(`${API_BASE_URL}/index`, {
         method: 'POST',
       });
-      const data = await response.json();
-      if (data.started) {
-        alert('Indexing started! This may take a few minutes. Refresh the page to see updated results.');
+      
+      if (response.status === 429) {
+        const data = await response.json();
+        alert(`Rate limit exceeded: ${data.detail}`);
+      } else if (response.ok) {
+        const data = await response.json();
+        if (data.started) {
+          alert('Indexing started! This may take a few minutes. Refresh the page to see updated results.');
+        }
+      } else {
+        alert('Failed to trigger indexing');
       }
     } catch (error) {
       console.error('Error triggering indexing:', error);

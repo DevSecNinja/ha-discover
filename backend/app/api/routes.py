@@ -1,6 +1,7 @@
 """API routes for HA Discover."""
 import logging
 from typing import List, Optional
+from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
@@ -12,6 +13,10 @@ from app.services.indexer import IndexingService
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
+
+# Rate limiting for indexing endpoint
+last_indexing_time: Optional[datetime] = None
+INDEXING_COOLDOWN_MINUTES = 10
 
 
 # Pydantic models for API
@@ -115,6 +120,7 @@ async def trigger_indexing(
     Trigger indexing of repositories with ha-discover topic.
     
     This endpoint starts indexing in the background.
+    Rate limited to once every 10 minutes to prevent API abuse.
     
     Args:
         background_tasks: FastAPI background tasks
@@ -122,7 +128,30 @@ async def trigger_indexing(
         
     Returns:
         Confirmation that indexing has started
+        
+    Raises:
+        HTTPException: If called within the cooldown period
     """
+    global last_indexing_time
+    
+    # Check if indexing was recently triggered
+    if last_indexing_time is not None:
+        time_since_last = datetime.utcnow() - last_indexing_time
+        cooldown = timedelta(minutes=INDEXING_COOLDOWN_MINUTES)
+        
+        if time_since_last < cooldown:
+            remaining_seconds = int((cooldown - time_since_last).total_seconds())
+            remaining_minutes = remaining_seconds // 60
+            remaining_seconds = remaining_seconds % 60
+            
+            raise HTTPException(
+                status_code=429,
+                detail=f"Indexing rate limit exceeded. Please wait {remaining_minutes}m {remaining_seconds}s before triggering again."
+            )
+    
+    # Update last indexing time
+    last_indexing_time = datetime.utcnow()
+    
     async def run_indexing():
         """Background task to run indexing."""
         indexer = IndexingService()
