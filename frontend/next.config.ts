@@ -6,8 +6,7 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
   // Set basePath for GitHub Pages (repo name)
-  // Uncomment and adjust if deploying to a repository subdirectory
-  // basePath: '/ha-discover',
+  basePath: '/ha-discover',
 };
 
 export default nextConfig;
