@@ -25,7 +25,7 @@ The system follows a traditional three-tier architecture with clear separation b
 
 ## High-Level Architecture
 
-\`\`\`
+```
 ┌─────────────────────────────────────────────────────────────┐
 │                          User Browser                        │
 │                     (Next.js Frontend)                      │
@@ -50,7 +50,7 @@ The system follows a traditional three-tier architecture with clear separation b
                     ┌─────────────────┐
                     │   GitHub API    │
                     └─────────────────┘
-\`\`\`
+```
 
 ## Data Flow
 
@@ -199,7 +199,7 @@ The system follows a traditional three-tier architecture with clear separation b
 
 Stores information about indexed GitHub repositories.
 
-\`\`\`sql
+```sql
 CREATE TABLE repositories (
     id INTEGER PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -208,13 +208,13 @@ CREATE TABLE repositories (
     url VARCHAR(512) NOT NULL UNIQUE,
     indexed_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
-\`\`\`
+```
 
 #### `automations`
 
 Stores individual Home Assistant automations.
 
-\`\`\`sql
+```sql
 CREATE TABLE automations (
     id INTEGER PRIMARY KEY,
     alias VARCHAR(512) NULL,
@@ -226,7 +226,7 @@ CREATE TABLE automations (
     indexed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (repository_id) REFERENCES repositories(id)
 );
-\`\`\`
+```
 
 ### Indexes
 
@@ -258,33 +258,33 @@ The API follows REST conventions:
 - `limit` (integer, optional, default=50, max=100): Results per page
 
 **Response:**
-\`\`\`json
+```json
 {
   "query": "string",
   "results": [...],
   "count": 0
 }
-\`\`\`
+```
 
 #### `GET /api/v1/statistics`
 
 **Response:**
-\`\`\`json
+```json
 {
   "total_repositories": 0,
   "total_automations": 0
 }
-\`\`\`
+```
 
 #### `POST /api/v1/index`
 
 **Response:**
-\`\`\`json
+```json
 {
   "message": "Indexing started in background",
   "started": true
 }
-\`\`\`
+```
 
 ### CORS Configuration
 
