@@ -1,14 +1,11 @@
 version: '3.8'
 
+# Production docker-compose configuration using pre-built images from GHCR
+# Usage: docker-compose -f docker-compose.prod.yml up -d
+
 services:
   api:
-    # Use the image from GHCR (recommended for production)
-    # Uncomment the line below and comment the build line to use pre-built images
-    # image: ghcr.io/devsecninja/ha-discover/backend:latest
-    
-    # Or build locally (for development)
-    build: ./backend
-    
+    image: ghcr.io/devsecninja/ha-discover/backend:latest
     ports:
       - "8000:8000"
     environment:
@@ -26,16 +23,7 @@ services:
       start_period: 5s
 
   web:
-    # Use the image from GHCR (recommended for production)
-    # Uncomment the line below and comment the build line to use pre-built images
-    # image: ghcr.io/devsecninja/ha-discover/frontend:latest
-    
-    # Or build locally (for development)
-    build:
-      context: ./frontend
-      args:
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000/api/v1}
-    
+    image: ghcr.io/devsecninja/ha-discover/frontend:latest
     ports:
       - "3000:80"
     depends_on:
@@ -50,4 +38,3 @@ services:
 
 volumes:
   api_data:
-  

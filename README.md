@@ -27,6 +27,8 @@ Home Assistant users often create sophisticated automations and share them on Gi
 - 🔗 **Direct GitHub Links**: Every automation links directly to its source on GitHub
 - 🎨 **Modern UI**: Clean, responsive interface built with Next.js and Tailwind CSS
 - ⚡ **Fast API**: RESTful API powered by FastAPI for quick searches
+- 🐳 **Docker Ready**: Pre-built Docker images available via GitHub Container Registry
+- 🔧 **Auto-Updates**: Renovate bot keeps dependencies automatically up-to-date
 
 ## How It Works
 
@@ -37,6 +39,23 @@ Home Assistant users often create sophisticated automations and share them on Gi
 5. **Search Interface**: Users can search through the indexed automations via a web UI
 
 ## Getting Started
+
+### Quick Start with Docker
+
+The easiest way to run HA Discover is using Docker:
+
+```bash
+# Using pre-built images from GitHub Container Registry
+docker-compose -f docker-compose.prod.yml up -d
+
+# Or build locally
+docker-compose up -d
+```
+
+The application will be available at:
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:8000
+- **API Documentation**: http://localhost:8000/docs
 
 ### Adding Your Repository
 
@@ -143,6 +162,34 @@ All tests should pass. The test suite includes:
 - YAML parsing tests
 - Search functionality tests
 - API endpoint tests
+
+### Docker Container Tests
+
+Docker containers are automatically tested on every PR and push to main:
+
+- Backend container build and health checks
+- Frontend container build and health checks
+- API endpoint functionality
+- Security headers validation
+- Integration test with both containers
+
+See `.github/workflows/docker-test.yml` for details.
+
+## Deployment
+
+HA Discover can be deployed in various ways:
+
+### Docker Deployment (Recommended)
+
+See [RELEASES.md](./RELEASES.md) for information about:
+- Using pre-built Docker images from GHCR
+- Semantic versioning
+- Release process
+- Docker image tags
+
+### GitHub Pages (Frontend Only)
+
+The frontend can be deployed to GitHub Pages. See the existing `.github/workflows/deploy.yml` workflow.
 
 ## Architecture
 

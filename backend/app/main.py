@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 
 from app.models import init_db
 from app.api.routes import router
+from app.version import __version__
 
 # Load environment variables
 load_dotenv()
@@ -20,7 +21,7 @@ logging.basicConfig(
 app = FastAPI(
     title="HA Discover API",
     description="Search engine for Home Assistant automations from GitHub",
-    version="1.0.0"
+    version=__version__
 )
 
 # Configure CORS for frontend
@@ -48,7 +49,7 @@ async def root():
     """Root endpoint."""
     return {
         "message": "HA Discover API",
-        "version": "1.0.0",
+        "version": __version__,
         "docs": "/docs"
     }
 
