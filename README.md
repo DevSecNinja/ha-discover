@@ -163,6 +163,18 @@ All tests should pass. The test suite includes:
 - Search functionality tests
 - API endpoint tests
 
+### Docker Container Tests
+
+Docker containers are automatically tested on every PR and push to main:
+
+- Backend container build and health checks
+- Frontend container build and health checks
+- API endpoint functionality
+- Security headers validation
+- Integration test with both containers
+
+See `.github/workflows/docker-test.yml` for details.
+
 ## Deployment
 
 HA Discover can be deployed in various ways:

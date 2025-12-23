@@ -1,0 +1,301 @@
+name: Docker Build and Test
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build backend Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: false
+          load: true
+          tags: ha-discover-backend:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Test backend container starts
+        run: |
+          # Start the container
+          docker run -d --name ha-discover-backend \
+            -p 8000:8000 \
+            ha-discover-backend:test
+          
+          # Wait for container to be healthy (max 60 seconds)
+          echo "Waiting for backend container to be healthy..."
+          timeout=60
+          elapsed=0
+          while [ $elapsed -lt $timeout ]; do
+            if [ "$(docker inspect --format='{{.State.Health.Status}}' ha-discover-backend 2>/dev/null)" = "healthy" ]; then
+              echo "✓ Backend container is healthy"
+              break
+            fi
+            echo "Waiting... ($elapsed seconds)"
+            sleep 5
+            elapsed=$((elapsed + 5))
+          done
+          
+          if [ $elapsed -ge $timeout ]; then
+            echo "✗ Backend container health check timeout"
+            docker logs ha-discover-backend
+            exit 1
+          fi
+
+      - name: Test backend API endpoints
+        run: |
+          echo "Testing API endpoints..."
+          
+          # Test root endpoint
+          response=$(curl -s http://localhost:8000/)
+          echo "Root endpoint response: $response"
+          if ! echo "$response" | grep -q "HA Discover API"; then
+            echo "✗ Root endpoint test failed"
+            exit 1
+          fi
+          echo "✓ Root endpoint works"
+          
+          # Test health endpoint
+          response=$(curl -s http://localhost:8000/api/v1/health)
+          echo "Health endpoint response: $response"
+          if ! echo "$response" | grep -q "healthy"; then
+            echo "✗ Health endpoint test failed"
+            exit 1
+          fi
+          echo "✓ Health endpoint works"
+          
+          # Test version in root endpoint
+          if ! echo "$response" | grep -q "version"; then
+            echo "✗ Version field not found in root endpoint"
+            exit 1
+          fi
+          echo "✓ Version field present"
+          
+          # Test statistics endpoint
+          response=$(curl -s http://localhost:8000/api/v1/statistics)
+          echo "Statistics endpoint response: $response"
+          if ! echo "$response" | grep -q "total_repositories"; then
+            echo "✗ Statistics endpoint test failed"
+            exit 1
+          fi
+          echo "✓ Statistics endpoint works"
+          
+          # Test search endpoint
+          response=$(curl -s "http://localhost:8000/api/v1/search?q=test")
+          echo "Search endpoint response: $response"
+          if ! echo "$response" | grep -q "results"; then
+            echo "✗ Search endpoint test failed"
+            exit 1
+          fi
+          echo "✓ Search endpoint works"
+          
+          # Test OpenAPI docs endpoint
+          status=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/docs)
+          if [ "$status" != "200" ]; then
+            echo "✗ OpenAPI docs endpoint returned status $status"
+            exit 1
+          fi
+          echo "✓ OpenAPI docs endpoint works"
+
+      - name: Show backend logs on failure
+        if: failure()
+        run: docker logs ha-discover-backend
+
+      - name: Cleanup backend container
+        if: always()
+        run: docker rm -f ha-discover-backend || true
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build frontend Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: false
+          load: true
+          tags: ha-discover-frontend:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+
+      - name: Test frontend container starts
+        run: |
+          # Start the container
+          docker run -d --name ha-discover-frontend \
+            -p 3000:80 \
+            ha-discover-frontend:test
+          
+          # Wait for container to be healthy (max 60 seconds)
+          echo "Waiting for frontend container to be healthy..."
+          timeout=60
+          elapsed=0
+          while [ $elapsed -lt $timeout ]; do
+            if [ "$(docker inspect --format='{{.State.Health.Status}}' ha-discover-frontend 2>/dev/null)" = "healthy" ]; then
+              echo "✓ Frontend container is healthy"
+              break
+            fi
+            echo "Waiting... ($elapsed seconds)"
+            sleep 5
+            elapsed=$((elapsed + 5))
+          done
+          
+          if [ $elapsed -ge $timeout ]; then
+            echo "✗ Frontend container health check timeout"
+            docker logs ha-discover-frontend
+            exit 1
+          fi
+
+      - name: Test frontend web server
+        run: |
+          echo "Testing frontend web server..."
+          
+          # Test root endpoint
+          status=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/)
+          if [ "$status" != "200" ]; then
+            echo "✗ Frontend root endpoint returned status $status"
+            exit 1
+          fi
+          echo "✓ Frontend root endpoint works (status: $status)"
+          
+          # Test that HTML is served
+          response=$(curl -s http://localhost:3000/)
+          if ! echo "$response" | grep -q "<!DOCTYPE html>"; then
+            echo "✗ Frontend does not serve HTML"
+            exit 1
+          fi
+          echo "✓ Frontend serves HTML correctly"
+          
+          # Test security headers
+          headers=$(curl -s -I http://localhost:3000/)
+          echo "Checking security headers..."
+          
+          if ! echo "$headers" | grep -qi "X-Frame-Options"; then
+            echo "✗ X-Frame-Options header missing"
+            exit 1
+          fi
+          echo "✓ X-Frame-Options header present"
+          
+          if ! echo "$headers" | grep -qi "X-Content-Type-Options"; then
+            echo "✗ X-Content-Type-Options header missing"
+            exit 1
+          fi
+          echo "✓ X-Content-Type-Options header present"
+          
+          if ! echo "$headers" | grep -qi "Content-Security-Policy"; then
+            echo "✗ Content-Security-Policy header missing"
+            exit 1
+          fi
+          echo "✓ Content-Security-Policy header present"
+
+      - name: Show frontend logs on failure
+        if: failure()
+        run: docker logs ha-discover-frontend
+
+      - name: Cleanup frontend container
+        if: always()
+        run: docker rm -f ha-discover-frontend || true
+
+  integration-test:
+    runs-on: ubuntu-latest
+    needs: [test-backend, test-frontend]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build backend Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: false
+          load: true
+          tags: ha-discover-backend:test
+          cache-from: type=gha
+
+      - name: Build frontend Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: false
+          load: true
+          tags: ha-discover-frontend:test
+          cache-from: type=gha
+          build-args: |
+            NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+
+      - name: Start both containers
+        run: |
+          # Start backend
+          docker run -d --name ha-discover-backend \
+            -p 8000:8000 \
+            ha-discover-backend:test
+          
+          # Start frontend
+          docker run -d --name ha-discover-frontend \
+            -p 3000:80 \
+            ha-discover-frontend:test
+          
+          echo "Waiting for both containers to be healthy..."
+          sleep 10
+
+      - name: Test integration
+        run: |
+          echo "Testing that both services are running together..."
+          
+          # Test backend is accessible
+          backend_status=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/api/v1/health)
+          if [ "$backend_status" != "200" ]; then
+            echo "✗ Backend not accessible (status: $backend_status)"
+            exit 1
+          fi
+          echo "✓ Backend accessible"
+          
+          # Test frontend is accessible
+          frontend_status=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/)
+          if [ "$frontend_status" != "200" ]; then
+            echo "✗ Frontend not accessible (status: $frontend_status)"
+            exit 1
+          fi
+          echo "✓ Frontend accessible"
+          
+          echo "✓ Integration test passed - both services running successfully"
+
+      - name: Show logs on failure
+        if: failure()
+        run: |
+          echo "=== Backend logs ==="
+          docker logs ha-discover-backend
+          echo "=== Frontend logs ==="
+          docker logs ha-discover-frontend
+
+      - name: Cleanup
+        if: always()
+        run: |
+          docker rm -f ha-discover-backend || true
+          docker rm -f ha-discover-frontend || true

@@ -202,10 +202,31 @@ Version information is stored in `/frontend/package.json`:
 Before creating a release, ensure:
 
 - [ ] All tests pass (`pytest tests/ -v` in backend)
+- [ ] Docker containers build and pass tests (check latest workflow run)
 - [ ] Documentation is up to date
 - [ ] CHANGELOG.md is updated (if exists)
 - [ ] Version numbers are appropriate for the changes
 - [ ] Breaking changes are documented
+
+## Continuous Integration
+
+### Docker Container Testing
+
+Every PR and push to main automatically:
+- Builds both Docker images
+- Tests container health checks
+- Validates API endpoints
+- Checks security headers
+- Runs integration tests
+
+See `.github/workflows/docker-test.yml` for the full test suite.
+
+### Before Release
+
+The release workflow includes all these checks plus:
+- Full backend test suite
+- Version file updates
+- Multi-platform image builds
 
 ## Release Notes
 
