@@ -46,13 +46,26 @@ The backend must be deployed to a hosting platform that supports Python applicat
 ### Environment Variables
 
 - `GITHUB_TOKEN` (optional): GitHub Personal Access Token for higher API rate limits
+- `ROOT_PATH` (optional): Base path for the API when deployed behind a reverse proxy or on cloud platforms (e.g., Azure Container Apps). Leave empty for default behavior.
 
 Create a `.env` file:
 
 ```bash
 cp .env.example .env
-# Edit .env and add your GitHub token
+# Edit .env and add your GitHub token and other configuration
 ```
+
+#### Deployment-Specific Configuration
+
+**Azure Container Apps / Cloud Platforms:**
+
+If you're deploying to Azure Container Apps or similar platforms where the application is accessed without the `/api/v1` prefix in the URL, you can set:
+
+```bash
+ROOT_PATH=/api/v1
+```
+
+This configures FastAPI to properly handle requests when the platform's routing layer strips or doesn't include the `/api/v1` prefix. Your application will then be accessible at the root URL (e.g., `https://your-app.azurecontainerapps.io/`) while maintaining the correct API path structure internally.
 
 ## 📚 API Endpoints
 

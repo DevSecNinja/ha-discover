@@ -1,5 +1,6 @@
 """Main FastAPI application for HA Discover."""
 import logging
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
@@ -17,11 +18,17 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 
+# Get root_path from environment variable
+# This allows the app to work correctly behind reverse proxies or when deployed
+# to cloud platforms with different base paths (e.g., Azure Container Apps)
+root_path = os.getenv("ROOT_PATH", "")
+
 # Create FastAPI app
 app = FastAPI(
     title="HA Discover API",
     description="Search engine for Home Assistant automations from GitHub",
-    version=__version__
+    version=__version__,
+    root_path=root_path
 )
 
 # Configure CORS for frontend
@@ -33,8 +40,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Determine the API route prefix based on root_path configuration
+# If root_path is already set to /api/v1, don't add it again to routes
+# This allows the app to work correctly when deployed behind reverse proxies
+api_prefix = "" if root_path else "/api/v1"
+
 # Include API routes
-app.include_router(router, prefix="/api/v1")
+app.include_router(router, prefix=api_prefix)
 
 
 @app.on_event("startup")
