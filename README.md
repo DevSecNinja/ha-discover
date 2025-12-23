@@ -150,8 +150,6 @@ For detailed information about the system architecture, data flow, and design de
 
 ### 🚀 Quick Deployment Guide
 
-**New to deployment?** Start here: **[QUICKSTART_DEPLOYMENT.md](./QUICKSTART_DEPLOYMENT.md)** - Get your backend deployed in 5 minutes with Railway.
-
 ### Frontend Deployment (GitHub Pages)
 
 The frontend is deployed to GitHub Pages for free static hosting. See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions.
