@@ -12,10 +12,13 @@ RUN npm ci
 # Copy application code
 COPY . .
 
-# Build the application for standalone deployment (not static export)
+# Build the application with static export
 # The build process will use NEXT_PUBLIC_API_URL from build args
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+
+# Remove basePath for Docker deployment (only needed for GitHub Pages)
+RUN sed -i '/basePath:/d' next.config.ts
 
 RUN npm run build
 

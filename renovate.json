@@ -54,15 +54,6 @@
       "matchManagers": ["github-actions"],
       "groupName": "GitHub Actions",
       "automerge": true
-    },
-    {
-      "description": "Separate critical security updates",
-      "matchDatasources": ["pypi", "npm"],
-      "vulnerabilityAlerts": {
-        "labels": ["security", "dependencies"],
-        "automerge": false,
-        "schedule": ["at any time"]
-      }
     }
   ],
   "vulnerabilityAlerts": {

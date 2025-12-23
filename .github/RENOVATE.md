@@ -11,6 +11,16 @@ Renovate automatically:
 - Prioritizes security updates
 - Auto-merges safe updates (minor/patch versions)
 
+## Setup
+
+This repository uses the **managed Renovate GitHub App**. To enable it:
+
+1. Install the Renovate app from the [GitHub Marketplace](https://github.com/apps/renovate)
+2. Grant access to this repository
+3. Renovate will automatically start using the configuration in `renovate.json`
+
+No workflow files or tokens are needed - the managed app handles everything.
+
 ## Configuration
 
 The main configuration is in [`renovate.json`](../renovate.json) at the repository root.
@@ -40,13 +50,6 @@ The main configuration is in [`renovate.json`](../renovate.json) at the reposito
 4. **GitHub Actions**
    - All: Auto-grouped and auto-merged
 
-## Workflow
-
-The Renovate workflow (`.github/workflows/renovate.yml`) runs on:
-- Schedule: Every 6 hours
-- Manual trigger: Via workflow dispatch
-- Config changes: When `renovate.json` is modified
-
 ## Dependency Dashboard
 
 Renovate creates a "Dependency Dashboard" issue that shows:
@@ -68,7 +71,7 @@ To temporarily disable Renovate:
    }
    ```
 
-2. Or close the Dependency Dashboard issue
+2. Or close the Dependency Dashboard issue (will reopen when you want to re-enable)
 
 ## Security Updates
 
@@ -115,13 +118,13 @@ To modify Renovate's behavior, edit `renovate.json`. Common customizations:
 
 ### Renovate Not Running
 
-1. Check workflow runs in Actions tab
-2. Verify `GITHUB_TOKEN` has required permissions
-3. Check if rate limits are exceeded
+1. Check if the Renovate app is installed for this repository
+2. Verify the app has the required permissions
+3. Check the Dependency Dashboard issue for any errors
 
 ### Too Many PRs
 
-Adjust rate limiting:
+Adjust rate limiting in `renovate.json`:
 
 ```json
 {
@@ -133,11 +136,12 @@ Adjust rate limiting:
 ### Renovate Stuck
 
 1. Close and reopen the Dependency Dashboard issue
-2. Manually trigger the workflow
-3. Check logs in Actions tab
+2. Check Renovate's debug logs (available in the dashboard issue)
+3. Verify `renovate.json` syntax is valid
 
 ## Resources
 
 - [Renovate Documentation](https://docs.renovatebot.com/)
 - [Configuration Options](https://docs.renovatebot.com/configuration-options/)
 - [Preset Configs](https://docs.renovatebot.com/presets/)
+- [GitHub App Installation](https://github.com/apps/renovate)

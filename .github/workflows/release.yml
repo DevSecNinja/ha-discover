@@ -192,6 +192,6 @@ jobs:
                 image: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ needs.determine-version.outputs.version }}
             ```
             
-            See the [DEPLOYMENT.md](./DEPLOYMENT.md) for more details.
+            See the [RELEASES.md](./RELEASES.md) for more details.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
