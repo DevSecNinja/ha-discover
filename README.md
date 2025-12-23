@@ -36,6 +36,20 @@ Home Assistant users often create sophisticated automations and share them on Gi
 
 ## Getting Started
 
+### Adding Your Repository
+
+To have your Home Assistant configuration indexed:
+
+1. Ensure your repository contains automation files (e.g., `automations.yaml`)
+2. Add the `ha-discover` topic to your GitHub repository:
+   - Go to your repository on GitHub
+   - Click the ⚙️ icon next to "About"
+   - Add `ha-discover` to the topics list
+   - Save changes
+3. Trigger indexing on HA Discover (or wait for the next scheduled index)
+
+## Develop a new feature
+
 ### Prerequisites
 
 - **Backend**: Python 3.12+, pip
@@ -46,14 +60,14 @@ Home Assistant users often create sophisticated automations and share them on Gi
 
 #### 1. Clone the Repository
 
-\`\`\`bash
+```bash
 git clone https://github.com/DevSecNinja/ha-discover.git
 cd ha-discover
-\`\`\`
+```
 
 #### 2. Set Up the Backend
 
-\`\`\`bash
+```bash
 cd backend
 
 # Create and activate virtual environment
@@ -69,7 +83,7 @@ cp .env.example .env
 
 # Run the backend server
 python -m uvicorn app.main:app --reload
-\`\`\`
+```
 
 The API will be available at `http://localhost:8000`
 
@@ -77,7 +91,7 @@ The API will be available at `http://localhost:8000`
 
 Open a new terminal:
 
-\`\`\`bash
+```bash
 cd frontend
 
 # Install dependencies
@@ -88,7 +102,7 @@ cp .env.local.example .env.local
 
 # Run the development server
 npm run dev
-\`\`\`
+```
 
 The web UI will be available at `http://localhost:3000`
 
@@ -97,18 +111,6 @@ The web UI will be available at `http://localhost:3000`
 1. Open your browser to `http://localhost:3000`
 2. Click the "Trigger Re-Index" button to start discovering repositories
 3. Wait a few moments, then refresh to see the results
-
-### Adding Your Repository
-
-To have your Home Assistant configuration indexed:
-
-1. Ensure your repository contains automation files (e.g., `automations.yaml`)
-2. Add the `ha-discover` topic to your GitHub repository:
-   - Go to your repository on GitHub
-   - Click the ⚙️ icon next to "About"
-   - Add `ha-discover` to the topics list
-   - Save changes
-3. Trigger indexing on HA Discover (or wait for the next scheduled index)
 
 ## API Documentation
 
@@ -128,13 +130,14 @@ The backend API is documented with OpenAPI/Swagger. Once the backend is running,
 
 ### Backend Tests
 
-\`\`\`bash
+```bash
 cd backend
 source venv/bin/activate
 pytest tests/ -v
-\`\`\`
+```
 
 All tests should pass. The test suite includes:
+
 - YAML parsing tests
 - Search functionality tests
 - API endpoint tests
@@ -160,10 +163,9 @@ This project is licensed under the MIT License. See the [LICENSE](./LICENSE) fil
 ## Support
 
 If you find HA Discover useful, consider:
+
 - ⭐ Starring the repository on GitHub
 - 🐛 Reporting bugs or suggesting features via GitHub Issues
 - 📢 Sharing with the Home Assistant community
-
----
 
 **Happy Automating! 🏠✨**
