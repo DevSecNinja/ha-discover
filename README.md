@@ -157,9 +157,10 @@ The frontend can be deployed to GitHub Pages for free hosting. See [DEPLOYMENT.m
 1. Enable GitHub Pages in repository settings (Source: GitHub Actions)
 2. Update the API URL in `.github/workflows/deploy.yml`
 3. Push to `main` branch or manually trigger the workflow
-4. Access your site at `https://<username>.github.io/<repository>/`
+4. Backend tests run automatically before deployment
+5. Access your site at `https://<username>.github.io/<repository>/`
 
-**Note**: You'll need to deploy the backend API separately to a hosting service (Heroku, Railway, Render, etc.) and configure the API URL in the deployment workflow.
+**Note**: You'll need to deploy the backend API separately to a hosting service (Heroku, Railway, Render, etc.) and configure the API URL in the deployment workflow. The deployment workflow runs all backend tests before deploying to ensure code quality.
 
 ## Contributing
 

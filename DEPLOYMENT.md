@@ -15,13 +15,20 @@ The frontend is configured for static export to GitHub Pages with the following 
 The deployment is automated via GitHub Actions (`.github/workflows/deploy.yml`):
 
 1. **Triggers**: Runs on push to `main` branch or manual workflow dispatch
-2. **Build**: 
+2. **Test**: 
+   - Sets up Python 3.12 environment
+   - Installs backend dependencies
+   - Runs all 23 backend tests with pytest
+   - Deployment continues only if all tests pass
+3. **Build**: 
    - Installs Node.js dependencies
    - Builds the Next.js static export
    - Creates the `out/` directory with static files
-3. **Deploy**: 
+4. **Deploy**: 
    - Uploads artifacts to GitHub Pages
    - Deploys to the configured GitHub Pages URL
+
+The workflow ensures code quality by running the full test suite before every deployment.
 
 ## Setup Instructions
 
