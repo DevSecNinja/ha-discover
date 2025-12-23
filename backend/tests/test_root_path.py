@@ -108,5 +108,3 @@ def test_openapi_schema_with_root_path(app_with_root_path):
     assert len(openapi_schema["servers"]) > 0
     # Check that the root_path is reflected in the server URL
     assert openapi_schema["servers"][0]["url"] == "/api/v1"
-
-
