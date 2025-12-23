@@ -33,21 +33,12 @@ pytest tests/ -v
 
 The backend must be deployed to a hosting platform that supports Python applications.
 
-**See [BACKEND_DEPLOYMENT.md](../BACKEND_DEPLOYMENT.md) for comprehensive deployment instructions.**
-
 ### Quick Deploy Options
 
-- **Railway** (recommended): Uses `railway.toml`
-- **Render**: Uses `render.yaml`
-- **Heroku**: Uses `Procfile` and `runtime.txt`
 - **Docker**: Uses `Dockerfile`
 
 ### Configuration Files
 
-- `railway.toml` - Railway deployment configuration
-- `render.yaml` - Render deployment configuration
-- `Procfile` - Heroku process configuration
-- `runtime.txt` - Python version for Heroku
 - `Dockerfile` - Docker container configuration
 
 ## 🔧 Configuration
@@ -87,10 +78,6 @@ backend/
 ├── tests/                # Test suite
 ├── requirements.txt      # Python dependencies
 ├── Dockerfile           # Docker configuration
-├── railway.toml         # Railway configuration
-├── render.yaml          # Render configuration
-├── Procfile             # Heroku configuration
-└── runtime.txt          # Python version
 
 ```
 
@@ -105,7 +92,6 @@ If you fork the repository, update the CORS origins in `app/main.py`.
 
 ## 📖 Documentation
 
-- [BACKEND_DEPLOYMENT.md](../BACKEND_DEPLOYMENT.md) - Deployment guide
 - [ARCHITECTURE.md](../ARCHITECTURE.md) - System architecture
 - [README.md](../README.md) - Project overview
 
