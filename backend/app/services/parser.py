@@ -183,14 +183,14 @@ class AutomationParser:
         Returns:
             List of unique service calls (e.g., 'light.turn_on')
         """
-        action_calls = []
+        action_calls_set = set()
         
         try:
             # Normalize to list
             if isinstance(actions, dict):
                 actions = [actions]
             elif not isinstance(actions, list):
-                return action_calls
+                return []
             
             # Extract service calls recursively
             def extract_from_action(action: Dict[str, Any]) -> None:
@@ -199,8 +199,8 @@ class AutomationParser:
                 
                 # Direct service call
                 service = action.get("service")
-                if service and service not in action_calls:
-                    action_calls.append(service)
+                if service:
+                    action_calls_set.add(service)
                 
                 # Check for nested actions (choose, if/then/else, repeat, etc.)
                 for key in ["then", "else", "sequence", "default"]:
@@ -228,4 +228,4 @@ class AutomationParser:
         except Exception as e:
             logger.warning(f"Error extracting action calls: {e}")
         
-        return action_calls
+        return list(action_calls_set)
