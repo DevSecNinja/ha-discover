@@ -1,4 +1,4 @@
-"""Main FastAPI application for HA Discover."""
+"""Main FastAPI application for hadiscover."""
 import logging
 import os
 from fastapi import FastAPI
@@ -25,7 +25,7 @@ root_path = os.getenv("ROOT_PATH", "")
 
 # Create FastAPI app
 app = FastAPI(
-    title="HA Discover API",
+    title="hadiscover API",
     description="Search engine for Home Assistant automations from GitHub",
     version=__version__,
     root_path=root_path
@@ -67,7 +67,7 @@ async def startup_event():
 async def root():
     """Root endpoint."""
     return {
-        "message": "HA Discover API",
+        "message": "hadiscover API",
         "version": __version__,
         "docs": "/docs"
     }
