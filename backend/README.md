@@ -65,7 +65,7 @@ Perfect for scheduled container jobs that run daily to index repositories.
 ### Quick Deploy Options
 
 - **Docker**: Uses `Dockerfile` with flexible entrypoint
-- **Container App Job**: Can be run with `index-once` argument
+- **Container App Job**: Can be run with `index-now` argument
 
 ### Configuration Files
 
@@ -77,7 +77,7 @@ Perfect for scheduled container jobs that run daily to index repositories.
 ### Environment Variables
 
 - `GITHUB_TOKEN` (optional): GitHub Personal Access Token for higher API rate limits
-- `ENVIRONMENT` (optional): Set to `development` to enable the manual `/index` endpoint trigger. Defaults to `production` which disables the endpoint. In production, use the `index-once` command for scheduled indexing.
+- `ENVIRONMENT` (optional): Set to `development` to enable the manual `/index` endpoint trigger. Defaults to `production` which disables the endpoint. In production, use the `index-now` command for scheduled indexing.
 - `ROOT_PATH` (optional): Base path for the API when deployed behind a reverse proxy or on cloud platforms (e.g., Azure Container Apps). Leave empty for default behavior.
 - `DATABASE_URL` (optional): Database connection URL. Defaults to `sqlite:///./data/hadiscover.db`
 
