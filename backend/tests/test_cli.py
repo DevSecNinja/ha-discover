@@ -34,8 +34,7 @@ async def test_run_indexing_success(test_db):
     }
     
     with patch('app.cli.IndexingService') as mock_indexer_class, \
-         patch('app.cli.get_db_session', return_value=test_db), \
-         patch('app.cli.init_db'):
+         patch('app.cli.get_db_session', return_value=test_db):
         
         mock_indexer = AsyncMock()
         mock_indexer.index_repositories.return_value = mock_stats
@@ -68,8 +67,7 @@ async def test_run_indexing_with_errors(test_db):
     }
     
     with patch('app.cli.IndexingService') as mock_indexer_class, \
-         patch('app.cli.get_db_session', return_value=test_db), \
-         patch('app.cli.init_db'):
+         patch('app.cli.get_db_session', return_value=test_db):
         
         mock_indexer = AsyncMock()
         mock_indexer.index_repositories.return_value = mock_stats
@@ -86,8 +84,7 @@ async def test_run_indexing_with_errors(test_db):
 async def test_run_indexing_exception(test_db):
     """Test indexing run with exception."""
     with patch('app.cli.IndexingService') as mock_indexer_class, \
-         patch('app.cli.get_db_session', return_value=test_db), \
-         patch('app.cli.init_db'):
+         patch('app.cli.get_db_session', return_value=test_db):
         
         mock_indexer = AsyncMock()
         mock_indexer.index_repositories.side_effect = Exception("Test error")
@@ -117,8 +114,8 @@ def test_main_unknown_command():
     assert exc_info.value.code == 1
 
 
-def test_main_index_once_command():
-    """Test CLI main with index-once command."""
+def test_main_index_now_command():
+    """Test CLI main with index-now command."""
     mock_stats = {
         "repositories_found": 5,
         "repositories_indexed": 5,
@@ -126,10 +123,9 @@ def test_main_index_once_command():
         "errors": 0
     }
     
-    with patch('sys.argv', ['cli.py', 'index-once']), \
+    with patch('sys.argv', ['cli.py', 'index-now']), \
          patch('app.cli.IndexingService') as mock_indexer_class, \
          patch('app.cli.get_db_session'), \
-         patch('app.cli.init_db'), \
          pytest.raises(SystemExit) as exc_info:
         
         mock_indexer = AsyncMock()
@@ -147,7 +143,7 @@ def test_get_db_session_default():
     with patch.dict(os.environ, {}, clear=True):
         with patch('app.cli.create_engine') as mock_engine:
             get_db_session()
-            mock_engine.assert_called_once_with("sqlite:///./data/hadiscover.db")
+            mock_engine.assert_called_once_with("sqlite:///./data/hadiscover.db", connect_args={"check_same_thread": False})
 
 
 def test_get_db_session_custom_url():
@@ -155,4 +151,4 @@ def test_get_db_session_custom_url():
     with patch.dict(os.environ, {"DATABASE_URL": "sqlite:///custom.db"}):
         with patch('app.cli.create_engine') as mock_engine:
             get_db_session()
-            mock_engine.assert_called_once_with("sqlite:///custom.db")
+            mock_engine.assert_called_once_with("sqlite:///custom.db", connect_args={"check_same_thread": False})

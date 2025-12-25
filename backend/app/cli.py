@@ -6,7 +6,6 @@ import sys
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from app.models import init_db
 from app.services.indexer import IndexingService
 
 # Configure logging
@@ -20,7 +19,12 @@ logger = logging.getLogger(__name__)
 def get_db_session():
     """Create a database session."""
     db_url = os.getenv("DATABASE_URL", "sqlite:///./data/hadiscover.db")
-    engine = create_engine(db_url)
+    engine = create_engine(db_url, connect_args={"check_same_thread": False} if "sqlite" in db_url else {})
+    
+    # Initialize database tables on this engine
+    from app.models.database import Base
+    Base.metadata.create_all(bind=engine)
+    
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     return SessionLocal()
 
@@ -28,9 +32,6 @@ def get_db_session():
 async def run_indexing():
     """Run the indexing process once and exit."""
     logger.info("Starting indexing job...")
-    
-    # Initialize database
-    init_db()
     
     # Get GitHub token from environment
     github_token = os.getenv("GITHUB_TOKEN")
@@ -40,7 +41,7 @@ async def run_indexing():
     # Create indexing service
     indexer = IndexingService(github_token=github_token)
     
-    # Get database session
+    # Get database session (this also initializes the database)
     db = get_db_session()
     
     try:
@@ -68,12 +69,12 @@ def main():
     if len(sys.argv) < 2:
         print("Usage: python -m app.cli <command>")
         print("Commands:")
-        print("  index-once    Run indexing once and exit")
+        print("  index-now    Run indexing once and exit")
         sys.exit(1)
     
     command = sys.argv[1]
     
-    if command == "index-once":
+    if command == "index-now":
         exit_code = asyncio.run(run_indexing())
         sys.exit(exit_code)
     else:

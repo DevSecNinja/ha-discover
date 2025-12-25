@@ -52,7 +52,7 @@ docker run -p 8000:8000 hadiscover-backend
 For running as a one-time indexing job (e.g., Azure Container App Job):
 
 ```bash
-docker run hadiscover-backend index-once
+docker run hadiscover-backend index-now
 ```
 
 This will:
@@ -123,10 +123,13 @@ In production, the `/index` endpoint is disabled for security. Instead, use the 
 
 ```bash
 # Run as a one-time job
-docker run hadiscover-backend index-once
+docker run hadiscover-backend index-now
 
 # Or using the CLI directly
-python -m app.cli index-once
+python -m app.cli index-now
+
+# Or exec into a running container
+docker exec -it <container-id> python -m app.cli index-now
 ```
 
 This is ideal for:
