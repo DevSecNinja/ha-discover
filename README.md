@@ -1,18 +1,18 @@
-# HA Discover
+# hadiscover
 
-**HA Discover** is a search engine for Home Assistant automations hosted on GitHub. It allows you to discover, explore, and learn from automations created by the Home Assistant community.
+**hadiscover** is a search engine for Home Assistant automations hosted on GitHub. It allows you to discover, explore, and learn from automations created by the Home Assistant community.
 
-## What is HA Discover?
+## What is hadiscover?
 
-HA Discover indexes Home Assistant automation files from GitHub repositories that opt in by adding the `ha-discover` topic to their repository. It provides a simple, searchable interface to find automations by name, description, trigger types, or related repositories.
+hadiscover indexes Home Assistant automation files from GitHub repositories that opt in by adding the `hadiscover` or `ha-discover` topic to their repository. It provides a simple, searchable interface to find automations by name, description, trigger types, or related repositories.
 
 Think of it as a specialized search engine for Home Assistant configurations—similar to how kubesearch.dev works for Kubernetes resources, but focused specifically on Home Assistant automations.
 
-[Try it out now!](https://hadiscover-frontend.ambitiousriver-9676de6e.westeurope.azurecontainerapps.io/)
+[Try it out now!](https://hadiscover.com/)
 
-## Why HA Discover?
+## Why hadiscover?
 
-Home Assistant users often create sophisticated automations and share them on GitHub, but discovering these automations can be challenging. HA Discover solves this by:
+Home Assistant users often create sophisticated automations and share them on GitHub, but discovering these automations can be challenging. hadiscover solves this by:
 
 - **Centralizing Discovery**: Aggregating automations from multiple repositories into one searchable index
 - **Facilitating Learning**: Helping users learn from real-world automation examples
@@ -23,7 +23,7 @@ Home Assistant users often create sophisticated automations and share them on Gi
 
 - 🔍 **Full-text Search**: Search automations by name, description, trigger types, and repository information
 - 📊 **Statistics Dashboard**: View total repositories and automations indexed
-- 🔄 **On-demand Indexing**: Trigger re-indexing to discover newly added repositories
+- 🔄 **Automated Indexing**: Daily scheduled indexing to discover newly added repositories (manual trigger available in development mode)
 - 🔗 **Direct GitHub Links**: Every automation links directly to its source on GitHub
 - 🎨 **Modern UI**: Clean, responsive interface built with Next.js and Tailwind CSS
 - ⚡ **Fast API**: RESTful API powered by FastAPI for quick searches
@@ -32,7 +32,7 @@ Home Assistant users often create sophisticated automations and share them on Gi
 
 ## How It Works
 
-1. **Repository Discovery**: HA Discover searches GitHub for repositories with the `ha-discover` topic
+1. **Repository Discovery**: hadiscover searches GitHub for repositories with the `hadiscover` or `ha-discover` topic
 2. **Automation Extraction**: For each repository, it locates automation files (e.g., `automations.yaml`)
 3. **Parsing**: Automations are parsed using best-effort YAML parsing to extract metadata
 4. **Indexing**: Automations are stored in a SQLite database with full-text search capability
@@ -42,7 +42,7 @@ Home Assistant users often create sophisticated automations and share them on Gi
 
 ### Quick Start with Docker
 
-The easiest way to run HA Discover is using Docker:
+The easiest way to run hadiscover is using Docker:
 
 ```bash
 # Using pre-built images from GitHub Container Registry
@@ -62,12 +62,12 @@ The application will be available at:
 To have your Home Assistant configuration indexed:
 
 1. Ensure your repository contains automation files (e.g., `automations.yaml`)
-2. Add the `ha-discover` topic to your GitHub repository:
+2. Add the `hadiscover` or `ha-discover` topic to your GitHub repository:
    - Go to your repository on GitHub
    - Click the ⚙️ icon next to "About"
-   - Add `ha-discover` to the topics list
+   - Add `hadiscover` (or `ha-discover` for backwards compatibility) to the topics list
    - Save changes
-3. Trigger indexing on HA Discover (or wait for the next scheduled index)
+3. Wait for the next scheduled indexing (runs daily at 2 AM UTC) or trigger it manually in development mode
 
 ## Develop a new feature
 
@@ -82,8 +82,8 @@ To have your Home Assistant configuration indexed:
 #### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/DevSecNinja/ha-discover.git
-cd ha-discover
+git clone https://github.com/DevSecNinja/hadiscover.git
+cd hadiscover
 ```
 
 #### 2. Set Up the Backend
@@ -211,7 +211,7 @@ This project is licensed under the MIT License. See the [LICENSE](./LICENSE) fil
 
 ## Support
 
-If you find HA Discover useful, consider:
+If you find hadiscover useful, consider:
 
 - ⭐ Starring the repository on GitHub
 - 🐛 Reporting bugs or suggesting features via GitHub Issues

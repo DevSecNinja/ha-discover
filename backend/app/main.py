@@ -1,4 +1,4 @@
-"""Main FastAPI application for HA Discover."""
+"""Main FastAPI application for hadiscover."""
 import logging
 import os
 from fastapi import FastAPI
@@ -25,7 +25,7 @@ root_path = os.getenv("ROOT_PATH", "")
 
 # Create FastAPI app
 app = FastAPI(
-    title="HA Discover API",
+    title="hadiscover API",
     description="Search engine for Home Assistant automations from GitHub",
     version=__version__,
     root_path=root_path
@@ -34,7 +34,13 @@ app = FastAPI(
 # Configure CORS for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", "https://hadiscover-frontend.ambitiousriver-9676de6e.westeurope.azurecontainerapps.io"],  # Next.js default
+    allow_origins=[
+        "http://localhost:3000", 
+        "http://127.0.0.1:3000", 
+        "https://hadiscover.com",
+        "https://www.hadiscover.com",
+        "https://api.hadiscover.com"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -60,7 +66,7 @@ async def startup_event():
 async def root():
     """Root endpoint."""
     return {
-        "message": "HA Discover API",
+        "message": "hadiscover API",
         "version": __version__,
         "docs": "/docs"
     }

@@ -132,6 +132,8 @@ class IndexingService:
                         alias=auto_data.get("alias"),
                         description=auto_data.get("description"),
                         trigger_types=",".join(auto_data.get("trigger_types", [])),
+                        blueprint_path=auto_data.get("blueprint_path"),
+                        action_calls=",".join(auto_data.get("action_calls", [])),
                         source_file_path=file_path,
                         github_url=f"{url}/blob/{branch}/{file_path}",
                         repository_id=repository.id

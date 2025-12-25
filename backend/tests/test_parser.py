@@ -117,3 +117,81 @@ def test_extract_trigger_types_with_list():
     assert len(result) == 2  # Duplicates removed
     assert "state" in result
     assert "time" in result
+
+
+def test_parse_blueprint_automation():
+    """Test parsing automation that uses a blueprint."""
+    yaml_with_blueprint = """
+alias: "Blueprint Based Automation"
+use_blueprint:
+  path: homeassistant/motion_light.yaml
+  input:
+    motion_entity: binary_sensor.motion
+    light_entity: light.living_room
+"""
+    parser = AutomationParser()
+    automations = parser.parse_automation_file(yaml_with_blueprint)
+    
+    assert len(automations) == 1
+    assert automations[0]["alias"] == "Blueprint Based Automation"
+    assert automations[0]["blueprint_path"] == "homeassistant/motion_light.yaml"
+    assert automations[0]["blueprint_input"] is not None
+
+
+def test_extract_action_calls():
+    """Test extracting service calls from actions."""
+    yaml_with_actions = """
+alias: "Test Actions"
+trigger:
+  platform: state
+  entity_id: sensor.test
+action:
+  - service: light.turn_on
+    entity_id: light.living_room
+  - service: notify.notify
+    data:
+      message: "Test"
+  - service: media_player.media_pause
+"""
+    parser = AutomationParser()
+    automations = parser.parse_automation_file(yaml_with_actions)
+    
+    assert len(automations) == 1
+    assert len(automations[0]["action_calls"]) == 3
+    assert "light.turn_on" in automations[0]["action_calls"]
+    assert "notify.notify" in automations[0]["action_calls"]
+    assert "media_player.media_pause" in automations[0]["action_calls"]
+
+
+def test_extract_nested_action_calls():
+    """Test extracting service calls from nested actions (choose, if/then)."""
+    yaml_with_nested = """
+alias: "Nested Actions"
+trigger:
+  platform: state
+  entity_id: sensor.test
+action:
+  - choose:
+      - conditions:
+          - condition: state
+            entity_id: sun.sun
+            state: above_horizon
+        sequence:
+          - service: light.turn_on
+      - conditions:
+          - condition: state
+            entity_id: sun.sun
+            state: below_horizon
+        sequence:
+          - service: light.turn_off
+    default:
+      - service: notify.notify
+"""
+    parser = AutomationParser()
+    automations = parser.parse_automation_file(yaml_with_nested)
+    
+    assert len(automations) == 1
+    assert len(automations[0]["action_calls"]) == 3
+    assert "light.turn_on" in automations[0]["action_calls"]
+    assert "light.turn_off" in automations[0]["action_calls"]
+    assert "notify.notify" in automations[0]["action_calls"]

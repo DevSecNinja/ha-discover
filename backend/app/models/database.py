@@ -1,4 +1,4 @@
-"""Database models for HA Discover."""
+"""Database models for hadiscover."""
 from datetime import datetime
 from typing import Optional
 from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey
@@ -35,6 +35,10 @@ class Automation(Base):
     alias = Column(String(512), nullable=True, index=True)
     description = Column(Text, nullable=True)
     trigger_types = Column(Text, nullable=True)  # Stored as comma-separated values
+    # Note: blueprint_path and action_calls are new fields. Existing databases will need
+    # to handle NULL values gracefully. SQLite automatically allows NULL for new columns.
+    blueprint_path = Column(String(512), nullable=True, index=True)  # Blueprint path if using blueprint
+    action_calls = Column(Text, nullable=True)  # Stored as comma-separated service calls
     source_file_path = Column(String(512), nullable=False)
     github_url = Column(String(1024), nullable=False)
     repository_id = Column(Integer, ForeignKey("repositories.id"), nullable=False)

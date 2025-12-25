@@ -58,12 +58,49 @@ def test_statistics_endpoint_structure():
 
 
 def test_index_endpoint():
-    """Test index trigger endpoint."""
-    client = TestClient(app)
-    response = client.post("/api/v1/index")
-    assert response.status_code == 200
+    """Test index trigger endpoint in development mode."""
+    import os
     
-    data = response.json()
-    assert "message" in data
-    assert "started" in data
-    assert data["started"] is True
+    # Save original environment and set to development
+    original_env = os.environ.get("ENVIRONMENT")
+    os.environ["ENVIRONMENT"] = "development"
+    
+    try:
+        client = TestClient(app)
+        response = client.post("/api/v1/index")
+        assert response.status_code == 200
+        
+        data = response.json()
+        assert "message" in data
+        assert "started" in data
+        assert data["started"] is True
+    finally:
+        # Restore original environment
+        if original_env is not None:
+            os.environ["ENVIRONMENT"] = original_env
+        elif "ENVIRONMENT" in os.environ:
+            del os.environ["ENVIRONMENT"]
+
+
+def test_index_endpoint_blocked_in_production():
+    """Test that index endpoint is blocked in production."""
+    import os
+    
+    # Save original environment and set to production
+    original_env = os.environ.get("ENVIRONMENT")
+    os.environ["ENVIRONMENT"] = "production"
+    
+    try:
+        client = TestClient(app)
+        response = client.post("/api/v1/index")
+        assert response.status_code == 403
+        
+        data = response.json()
+        assert "detail" in data
+        assert "not available in production" in data["detail"].lower()
+    finally:
+        # Restore original environment
+        if original_env is not None:
+            os.environ["ENVIRONMENT"] = original_env
+        elif "ENVIRONMENT" in os.environ:
+            del os.environ["ENVIRONMENT"]

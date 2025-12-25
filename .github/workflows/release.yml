@@ -95,11 +95,7 @@ jobs:
             type=raw,value=latest
 
       - name: Update backend version
-        working-directory: ./backend
-        run: |
-          echo "\"\"\"Version information for HA Discover backend.\"\"\"" > app/version.py
-          echo "" >> app/version.py
-          echo "__version__ = \"${{ needs.determine-version.outputs.version }}\"" >> app/version.py
+        run: .github/scripts/update-backend-version.sh ${{ needs.determine-version.outputs.version }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6

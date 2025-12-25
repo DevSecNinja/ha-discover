@@ -1,4 +1,4 @@
-"""GitHub API integration service for discovering repositories with ha-discover topic."""
+"""GitHub API integration service for discovering repositories with hadiscover topic."""
 import os
 import logging
 import base64
@@ -12,7 +12,7 @@ class GitHubService:
     """Service for interacting with GitHub API."""
     
     BASE_URL = "https://api.github.com"
-    SEARCH_TOPIC = "ha-discover"
+    SEARCH_TOPICS = ["hadiscover", "ha-discover"]  # Support both topics for backwards compatibility
     
     def __init__(self, token: Optional[str] = None):
         """Initialize GitHub service with optional authentication token."""
@@ -25,7 +25,7 @@ class GitHubService:
     
     async def search_repositories(self, per_page: int = 100) -> List[Dict]:
         """
-        Search for repositories with the ha-discover topic.
+        Search for repositories with the hadiscover or ha-discover topics.
         
         Args:
             per_page: Number of results per page (max 100)
@@ -33,49 +33,58 @@ class GitHubService:
         Returns:
             List of repository metadata dictionaries
         """
-        repositories = []
-        page = 1
+        all_repositories = []
+        seen_repos = set()  # Track repos to avoid duplicates
         
         async with httpx.AsyncClient() as client:
-            while True:
-                try:
-                    url = f"{self.BASE_URL}/search/repositories"
-                    params = {
-                        "q": f"topic:{self.SEARCH_TOPIC}",
-                        "per_page": per_page,
-                        "page": page
-                    }
-                    
-                    response = await client.get(url, headers=self.headers, params=params, timeout=30.0)
-                    response.raise_for_status()
-                    
-                    data = response.json()
-                    items = data.get("items", [])
-                    
-                    if not items:
+            # Search for each topic
+            for topic in self.SEARCH_TOPICS:
+                page = 1
+                while True:
+                    try:
+                        url = f"{self.BASE_URL}/search/repositories"
+                        params = {
+                            "q": f"topic:{topic}",
+                            "per_page": per_page,
+                            "page": page
+                        }
+                        
+                        response = await client.get(url, headers=self.headers, params=params, timeout=30.0)
+                        response.raise_for_status()
+                        
+                        data = response.json()
+                        items = data.get("items", [])
+                        
+                        if not items:
+                            break
+                        
+                        for repo in items:
+                            repo_key = f"{repo['owner']['login']}/{repo['name']}"
+                            # Skip if we've already seen this repo
+                            if repo_key in seen_repos:
+                                continue
+                            
+                            seen_repos.add(repo_key)
+                            all_repositories.append({
+                                "name": repo["name"],
+                                "owner": repo["owner"]["login"],
+                                "description": repo.get("description", ""),
+                                "url": repo["html_url"],
+                                "default_branch": repo.get("default_branch", "main"),
+                            })
+                        
+                        # Check if there are more pages
+                        if len(items) < per_page:
+                            break
+                        
+                        page += 1
+                        
+                    except httpx.HTTPError as e:
+                        logger.error(f"Error searching repositories with topic '{topic}': {e}")
                         break
-                    
-                    for repo in items:
-                        repositories.append({
-                            "name": repo["name"],
-                            "owner": repo["owner"]["login"],
-                            "description": repo.get("description", ""),
-                            "url": repo["html_url"],
-                            "default_branch": repo.get("default_branch", "main"),
-                        })
-                    
-                    # Check if there are more pages
-                    if len(items) < per_page:
-                        break
-                    
-                    page += 1
-                    
-                except httpx.HTTPError as e:
-                    logger.error(f"Error searching repositories: {e}")
-                    break
         
-        logger.info(f"Found {len(repositories)} repositories with topic '{self.SEARCH_TOPIC}'")
-        return repositories
+        logger.info(f"Found {len(all_repositories)} repositories with topics {self.SEARCH_TOPICS}")
+        return all_repositories
     
     async def get_file_content(self, owner: str, repo: str, path: str, branch: str = "main") -> Optional[str]:
         """

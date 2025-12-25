@@ -73,9 +73,9 @@ jobs:
         env:
           # Configure your backend API URL here or use GitHub Secrets
           # Option 1: Direct URL (quick start)
-          # NEXT_PUBLIC_API_URL: https://your-backend.railway.app/api/v1
+          # NEXT_PUBLIC_API_URL: https://your-backend-api.railway.app/api/v1
           # Option 2: GitHub Secret (recommended for production)
-          NEXT_PUBLIC_API_URL: ${{ secrets.API_URL || 'https://ha-discover-api.yourdomain.com/api/v1' }}
+          NEXT_PUBLIC_API_URL: ${{ secrets.API_URL || 'https://api.hadiscover.com/api/v1' }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4

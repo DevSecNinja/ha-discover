@@ -90,10 +90,19 @@ class AutomationParser:
             # Extract trigger types (best effort)
             trigger_types = AutomationParser._extract_trigger_types(automation.get("trigger", []))
             
+            # Extract blueprint information
+            blueprint_info = AutomationParser._extract_blueprint_info(automation)
+            
+            # Extract action calls (services used)
+            action_calls = AutomationParser._extract_action_calls(automation.get("action", []))
+            
             return {
                 "alias": alias,
                 "description": description,
                 "trigger_types": trigger_types,
+                "blueprint_path": blueprint_info.get("path") if blueprint_info else None,
+                "blueprint_input": blueprint_info.get("input") if blueprint_info else None,
+                "action_calls": action_calls,
             }
             
         except Exception as e:
@@ -134,3 +143,89 @@ class AutomationParser:
             logger.warning(f"Error extracting trigger types: {e}")
         
         return trigger_types
+    
+    @staticmethod
+    def _extract_blueprint_info(automation: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """
+        Extract blueprint information from automation.
+        
+        Automations using blueprints have a 'use_blueprint' key with path and input.
+        
+        Args:
+            automation: Automation dictionary
+            
+        Returns:
+            Dictionary with blueprint path and input, or None if not a blueprint
+        """
+        try:
+            use_blueprint = automation.get("use_blueprint")
+            if use_blueprint and isinstance(use_blueprint, dict):
+                return {
+                    "path": use_blueprint.get("path", ""),
+                    "input": use_blueprint.get("input", {})
+                }
+        except Exception as e:
+            logger.warning(f"Error extracting blueprint info: {e}")
+        
+        return None
+    
+    @staticmethod
+    def _extract_action_calls(actions: Any) -> List[str]:
+        """
+        Extract service calls from automation actions.
+        
+        Actions can be a single dict or a list of dicts.
+        Each action may have a 'service' key.
+        
+        Args:
+            actions: Action configuration (dict or list)
+            
+        Returns:
+            List of unique service calls (e.g., 'light.turn_on')
+        """
+        action_calls_set = set()
+        
+        try:
+            # Normalize to list
+            if isinstance(actions, dict):
+                actions = [actions]
+            elif not isinstance(actions, list):
+                return []
+            
+            # Extract service calls recursively
+            def extract_from_action(action: Dict[str, Any]) -> None:
+                if not isinstance(action, dict):
+                    return
+                
+                # Direct service call
+                service = action.get("service")
+                if service:
+                    action_calls_set.add(service)
+                
+                # Check for nested actions (choose, if/then/else, repeat, etc.)
+                for key in ["then", "else", "sequence", "default"]:
+                    nested = action.get(key)
+                    if nested:
+                        if isinstance(nested, list):
+                            for nested_action in nested:
+                                extract_from_action(nested_action)
+                        elif isinstance(nested, dict):
+                            extract_from_action(nested)
+                
+                # Handle choose actions
+                choose = action.get("choose")
+                if isinstance(choose, list):
+                    for choice in choose:
+                        if isinstance(choice, dict):
+                            sequence = choice.get("sequence")
+                            if isinstance(sequence, list):
+                                for seq_action in sequence:
+                                    extract_from_action(seq_action)
+            
+            for action in actions:
+                extract_from_action(action)
+        
+        except Exception as e:
+            logger.warning(f"Error extracting action calls: {e}")
+        
+        return list(action_calls_set)

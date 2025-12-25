@@ -53,6 +53,8 @@ class SearchService:
                     "alias": automation.alias,
                     "description": automation.description,
                     "trigger_types": automation.trigger_types.split(",") if automation.trigger_types else [],
+                    "blueprint_path": automation.blueprint_path,
+                    "action_calls": automation.action_calls.split(",") if automation.action_calls else [],
                     "source_file_path": automation.source_file_path,
                     "github_url": automation.github_url,
                     "repository": {
@@ -95,6 +97,8 @@ class SearchService:
                     "alias": automation.alias,
                     "description": automation.description,
                     "trigger_types": automation.trigger_types.split(",") if automation.trigger_types else [],
+                    "blueprint_path": automation.blueprint_path,
+                    "action_calls": automation.action_calls.split(",") if automation.action_calls else [],
                     "source_file_path": automation.source_file_path,
                     "github_url": automation.github_url,
                     "repository": {
