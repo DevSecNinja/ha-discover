@@ -1,6 +1,6 @@
-# HA Discover Backend
+# hadiscover Backend
 
-This is the backend API for HA Discover, built with FastAPI.
+This is the backend API for hadiscover, built with FastAPI.
 
 ## 🚀 Quick Start
 
@@ -31,23 +31,55 @@ pytest tests/ -v
 
 ## 🌐 Deployment
 
-The backend must be deployed to a hosting platform that supports Python applications.
+The backend can be deployed as a web server or as a scheduled indexing job.
+
+### Running Modes
+
+#### Web Server Mode (Default)
+
+```bash
+docker run -p 8000:8000 hadiscover-backend
+```
+
+or using the entrypoint:
+
+```bash
+docker run -p 8000:8000 hadiscover-backend
+```
+
+#### Indexing Job Mode
+
+For running as a one-time indexing job (e.g., Azure Container App Job):
+
+```bash
+docker run hadiscover-backend index-once
+```
+
+This will:
+1. Initialize the database
+2. Run the indexing process once
+3. Exit with code 0 on success or 1 on failure
+
+Perfect for scheduled container jobs that run daily to index repositories.
 
 ### Quick Deploy Options
 
-- **Docker**: Uses `Dockerfile`
+- **Docker**: Uses `Dockerfile` with flexible entrypoint
+- **Container App Job**: Can be run with `index-once` argument
 
 ### Configuration Files
 
 - `Dockerfile` - Docker container configuration
+- `entrypoint.sh` - Entrypoint script supporting multiple run modes
 
 ## 🔧 Configuration
 
 ### Environment Variables
 
 - `GITHUB_TOKEN` (optional): GitHub Personal Access Token for higher API rate limits
-- `ENVIRONMENT` (optional): Set to `development` to enable the manual `/index` endpoint trigger. Defaults to `production` which disables the endpoint. In production, indexing runs on a daily schedule via GitHub Actions.
+- `ENVIRONMENT` (optional): Set to `development` to enable the manual `/index` endpoint trigger. Defaults to `production` which disables the endpoint. In production, use the `index-once` command for scheduled indexing.
 - `ROOT_PATH` (optional): Base path for the API when deployed behind a reverse proxy or on cloud platforms (e.g., Azure Container Apps). Leave empty for default behavior.
+- `DATABASE_URL` (optional): Database connection URL. Defaults to `sqlite:///./data/hadiscover.db`
 
 Create a `.env` file:
 
@@ -75,12 +107,40 @@ This configures FastAPI to properly handle requests when the platform's routing 
 - `POST /api/v1/index` - Trigger repository indexing (development only)
 - `GET /api/v1/health` - Health check
 
+## 🔄 Indexing
+
+### Development Mode
+
+In development, you can manually trigger indexing via the API:
+
+```bash
+curl -X POST http://localhost:8000/api/v1/index
+```
+
+### Production Mode
+
+In production, the `/index` endpoint is disabled for security. Instead, use the container's CLI:
+
+```bash
+# Run as a one-time job
+docker run hadiscover-backend index-once
+
+# Or using the CLI directly
+python -m app.cli index-once
+```
+
+This is ideal for:
+- Azure Container App Jobs scheduled to run daily
+- Kubernetes CronJobs
+- Any container orchestration platform with scheduled job support
+
 ## 🛠️ Project Structure
 
 ```
 backend/
 ├── app/
 │   ├── main.py           # FastAPI application
+│   ├── cli.py            # CLI commands for batch operations
 │   ├── models/           # Database models
 │   ├── services/         # Business logic
 │   │   ├── github_service.py
@@ -92,6 +152,7 @@ backend/
 ├── tests/                # Test suite
 ├── requirements.txt      # Python dependencies
 ├── Dockerfile           # Docker configuration
+├── entrypoint.sh        # Container entrypoint script
 
 ```
 
@@ -100,7 +161,9 @@ backend/
 The backend is configured to accept requests from:
 - `http://localhost:3000` (local frontend)
 - `http://127.0.0.1:3000` (local frontend)
-- `https://hadiscover-frontend.ambitiousriver-9676de6e.westeurope.azurecontainerapps.io` (production frontend)
+- `https://hadiscover.com` (production frontend)
+- `https://www.hadiscover.com` (production frontend)
+- `https://api.hadiscover.com` (production API)
 
 If you fork the repository, update the CORS origins in `app/main.py`.
 
@@ -113,7 +176,7 @@ If you fork the repository, update the CORS origins in `app/main.py`.
 
 ### Database Issues
 
-The app uses SQLite with the database stored in `data/ha_discover.db`. If you encounter database issues:
+The app uses SQLite with the database stored in `data/hadiscover.db`. If you encounter database issues:
 
 ```bash
 # Remove the database and restart

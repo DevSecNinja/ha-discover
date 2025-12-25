@@ -39,8 +39,7 @@ app.add_middleware(
         "http://127.0.0.1:3000", 
         "https://hadiscover.com",
         "https://www.hadiscover.com",
-        "https://api.hadiscover.com",
-        "https://hadiscover-frontend.ambitiousriver-9676de6e.westeurope.azurecontainerapps.io"  # Legacy URL
+        "https://api.hadiscover.com"
     ],
     allow_credentials=True,
     allow_methods=["*"],
