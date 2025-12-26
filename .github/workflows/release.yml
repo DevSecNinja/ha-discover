@@ -36,15 +36,10 @@ jobs:
           cache-dependency-path: backend/requirements.txt
 
       - name: Install backend dependencies
-        working-directory: ./backend
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+        run: .github/scripts/install-backend-deps.sh
 
       - name: Run backend tests
-        working-directory: ./backend
-        run: |
-          pytest tests/ -v --tb=short
+        run: .github/scripts/run-backend-tests.sh
 
   determine-version:
     runs-on: ubuntu-latest
@@ -58,16 +53,14 @@ jobs:
       - name: Get version
         id: get_version
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            VERSION="${{ github.event.inputs.version }}"
-            echo "version=${VERSION}" >> $GITHUB_OUTPUT
-            echo "version_tag=v${VERSION}" >> $GITHUB_OUTPUT
-          else
-            # Extract version from tag (e.g., v1.0.0 -> 1.0.0)
-            VERSION=${GITHUB_REF#refs/tags/v}
-            echo "version=${VERSION}" >> $GITHUB_OUTPUT
-            echo "version_tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-          fi
+          OUTPUT=$(.github/scripts/extract-version.sh "${{ github.event_name }}" "${{ github.event.inputs.version }}" "${{ github.ref }}")
+          echo "$OUTPUT" >> $GITHUB_OUTPUT
+          
+          # Extract version for validation
+          VERSION=$(echo "$OUTPUT" | grep "^version=" | cut -d= -f2)
+          
+          # Validate version format
+          .github/scripts/validate-version.sh "$VERSION"
 
   build-and-push-backend:
     needs: [test, determine-version]
@@ -131,10 +124,7 @@ jobs:
             type=raw,value=latest
 
       - name: Update frontend version
-        working-directory: ./frontend
-        run: |
-          # Update package.json version
-          npm version ${{ needs.determine-version.outputs.version }} --no-git-tag-version
+        run: .github/scripts/update-frontend-version.sh ${{ needs.determine-version.outputs.version }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6

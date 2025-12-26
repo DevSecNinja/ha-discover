@@ -177,7 +177,7 @@ See `.github/workflows/docker-test.yml` for details.
 
 ## Deployment
 
-HA Discover can be deployed in various ways:
+hadiscover can be deployed in various ways:
 
 ### Docker Deployment (Recommended)
 

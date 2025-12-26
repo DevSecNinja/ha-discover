@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from .database import Base
 
 # Get database URL from environment or use default
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./ha_discover.db")
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./data/hadiscover.db")
 
 # Create engine
 engine = create_engine(

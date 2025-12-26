@@ -33,37 +33,14 @@ jobs:
 
       - name: Test backend container starts
         run: |
-          # Start the container with development environment
-          docker run -d \
-            --name ha-discover-backend \
-            -p 8000:8000 \
-            -e ENVIRONMENT=development \
-            ha-discover-backend:test
-          
-          # Wait for container to be healthy
+          .github/scripts/start-backend-container.sh ha-discover-backend ha-discover-backend:test 8000
           .github/scripts/wait-for-healthy.sh ha-discover-backend 60
 
       - name: Test backend API endpoints
         run: .github/scripts/test-backend-api.sh 8000
 
       - name: Test index-now command
-        run: |
-          echo "Testing index-now command in container..."
-          
-          # Test that index-now command exists and is executable
-          docker exec ha-discover-backend which index-now
-          
-          # Test that index-now command can be invoked directly
-          # (Note: This will fail indexing due to no GitHub token, but should start correctly)
-          docker exec ha-discover-backend timeout 10 index-now 2>&1 | head -20 || true
-          
-          # Verify the command started the indexing process
-          if docker exec ha-discover-backend timeout 10 index-now 2>&1 | grep -q "Starting indexing job"; then
-            echo "✓ index-now command executed successfully"
-          else
-            echo "✗ index-now command failed to start"
-            exit 1
-          fi
+        run: .github/scripts/test-index-now.sh ha-discover-backend
 
       - name: Show backend logs on failure
         if: failure()
@@ -71,7 +48,7 @@ jobs:
 
       - name: Cleanup backend container
         if: always()
-        run: docker rm -f ha-discover-backend || true
+        run: .github/scripts/cleanup-containers.sh ha-discover-backend
 
   test-frontend:
     runs-on: ubuntu-latest
@@ -96,10 +73,7 @@ jobs:
 
       - name: Test frontend container starts
         run: |
-          # Start the container
           .github/scripts/start-container.sh ha-discover-frontend ha-discover-frontend:test 3000:80
-          
-          # Wait for container to be healthy
           .github/scripts/wait-for-healthy.sh ha-discover-frontend 60
 
       - name: Test frontend web server
@@ -111,7 +85,7 @@ jobs:
 
       - name: Cleanup frontend container
         if: always()
-        run: docker rm -f ha-discover-frontend || true
+        run: .github/scripts/cleanup-containers.sh ha-discover-frontend
 
   integration-test:
     runs-on: ubuntu-latest
@@ -144,69 +118,15 @@ jobs:
             NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
 
       - name: Start both containers
-        run: |
-          # Start backend with development environment
-          docker run -d \
-            --name ha-discover-backend \
-            -p 8000:8000 \
-            -e ENVIRONMENT=development \
-            ha-discover-backend:test
-          
-          # Start frontend
-          .github/scripts/start-container.sh ha-discover-frontend ha-discover-frontend:test 3000:80
-          
-          echo "Waiting for both containers to be healthy..."
-          sleep 10
+        run: .github/scripts/start-integration-containers.sh ha-discover-backend:test ha-discover-frontend:test
 
       - name: Test integration
-        run: |
-          echo "Testing that both services are running together..."
-          
-          # Test backend is accessible
-          backend_status=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/api/v1/health)
-          if [ "$backend_status" != "200" ]; then
-            echo "✗ Backend not accessible (status: $backend_status)"
-            exit 1
-          fi
-          echo "✓ Backend accessible"
-          
-          # Test frontend is accessible
-          frontend_status=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/)
-          if [ "$frontend_status" != "200" ]; then
-            echo "✗ Frontend not accessible (status: $frontend_status)"
-            exit 1
-          fi
-          echo "✓ Frontend accessible"
-          
-          # Test index-now command in backend container
-          echo "Testing index-now command..."
-          if docker exec ha-discover-backend which index-now > /dev/null 2>&1; then
-            echo "✓ index-now command found in PATH"
-          else
-            echo "✗ index-now command not found in PATH"
-            exit 1
-          fi
-          
-          # Test that index-now can be executed
-          if docker exec ha-discover-backend timeout 5 index-now 2>&1 | grep -q "Starting indexing job"; then
-            echo "✓ index-now command executes correctly"
-          else
-            echo "✗ index-now command failed to execute"
-            exit 1
-          fi
-          
-          echo "✓ Integration test passed - both services running successfully"
+        run: .github/scripts/test-integration.sh
 
       - name: Show logs on failure
         if: failure()
-        run: |
-          echo "=== Backend logs ==="
-          docker logs ha-discover-backend
-          echo "=== Frontend logs ==="
-          docker logs ha-discover-frontend
+        run: .github/scripts/show-container-logs.sh ha-discover-backend ha-discover-frontend
 
       - name: Cleanup
         if: always()
-        run: |
-          docker rm -f ha-discover-backend || true
-          docker rm -f ha-discover-frontend || true
+        run: .github/scripts/cleanup-containers.sh ha-discover-backend ha-discover-frontend

@@ -1,6 +1,6 @@
 # Architecture Documentation
 
-This document provides a comprehensive overview of the HA Discover system architecture, including data flow, design decisions, and implementation details.
+This document provides a comprehensive overview of the hadiscover system architecture, including data flow, design decisions, and implementation details.
 
 ## Table of Contents
 
@@ -14,7 +14,7 @@ This document provides a comprehensive overview of the HA Discover system archit
 
 ## System Overview
 
-HA Discover is a full-stack web application consisting of:
+hadiscover is a full-stack web application consisting of:
 
 - **Backend**: Python FastAPI service for data indexing and search
 - **Frontend**: Next.js React application for user interface
@@ -300,7 +300,9 @@ The API follows REST conventions:
 Backend allows requests from:
 - `http://localhost:3000`
 - `http://127.0.0.1:3000`
-- `https://hadiscover-frontend.ambitiousriver-9676de6e.westeurope.azurecontainerapps.io`
+- `https://hadiscover.com`
+- `https://www.hadiscover.com`
+- `https://api.hadiscover.com`
 
 This enables local development with separate backend/frontend servers.
 
@@ -416,4 +418,4 @@ Potential improvements beyond MVP scope:
 
 ## Conclusion
 
-HA Discover uses a straightforward, maintainable architecture appropriate for an MVP. The system prioritizes simplicity, fault tolerance, and extensibility. All components are loosely coupled, making it easy to swap implementations or add features in the future.
+hadiscover uses a straightforward, maintainable architecture appropriate for an MVP. The system prioritizes simplicity, fault tolerance, and extensibility. All components are loosely coupled, making it easy to swap implementations or add features in the future.

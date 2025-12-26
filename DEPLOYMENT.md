@@ -102,11 +102,11 @@ After successful deployment, your site will be available at:
 https://<username>.github.io/<repository-name>/
 ```
 
-For example: `https://hadiscover-frontend.ambitiousriver-9676de6e.westeurope.azurecontainerapps.io/`
+For example: `https://devsecninja.github.io/hadiscover/`
 
 ## Base Path Configuration
 
-The site is configured to deploy to the repository subdirectory at `devsecninja.github.io/ha-discover`. The `basePath` is already set in `next.config.ts`:
+The site uses a `basePath` in `next.config.ts` for GitHub Pages deployment:
 
 ```typescript
 const nextConfig: NextConfig = {
@@ -114,11 +114,11 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  basePath: '/ha-discover',  // Required for GitHub Pages deployment
+  basePath: '/ha-discover',  // Repository subdirectory path
 };
 ```
 
-**Important**: The `basePath` must match your repository name for GitHub Pages to work correctly. If you fork this repository or deploy to a different location, update the `basePath` accordingly and rebuild before deploying.
+**Important**: The `basePath` must match your repository structure for GitHub Pages to work correctly. If you fork this repository or deploy to a different location, update the `basePath` accordingly and rebuild before deploying.
 
 ## Troubleshooting
 

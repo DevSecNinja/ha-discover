@@ -93,4 +93,12 @@ Root: README.md, ARCHITECTURE.md, DEPLOYMENT.md, docker-compose.yml
 **Frontend**: Run `npm run build` (completes successfully), check TypeScript compiles, verify rendering
 **Before merge**: All GitHub workflows pass (especially docker-test.yml), no new security issues, docs updated if needed
 
+## Workflow Scripts
+
+**IMPORTANT**: All multiline scripts in GitHub Actions workflows MUST be extracted to separate files in `.github/scripts/` directory. Do NOT write inline multiline scripts in workflow files.
+
+**Rationale**: Separate script files improve maintainability, testability, and reusability. They can be tested locally and are easier to version control and review.
+
+**Existing scripts**: See `.github/scripts/` directory for examples of properly extracted scripts.
+
 Trust these instructions. Only search if incomplete, conflicting, or encountering undocumented errors.
