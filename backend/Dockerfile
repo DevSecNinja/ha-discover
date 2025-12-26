@@ -16,6 +16,10 @@ RUN mkdir -p /app/data
 # Make entrypoint script executable
 RUN chmod +x /app/entrypoint.sh
 
+# Install index-now command to PATH
+RUN chmod +x /app/index-now && \
+    cp /app/index-now /usr/local/bin/index-now
+
 # Expose port
 EXPOSE 8000
 

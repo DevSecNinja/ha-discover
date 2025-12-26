@@ -125,10 +125,10 @@ In production, the `/index` endpoint is disabled for security. Instead, use the 
 # Run as a one-time job
 docker run hadiscover-backend index-now
 
-# Or using the CLI directly
-python -m app.cli index-now
+# Or exec into a running container (short form)
+docker exec -it <container-id> index-now
 
-# Or exec into a running container
+# Or exec into a running container (long form)
 docker exec -it <container-id> python -m app.cli index-now
 ```
 
