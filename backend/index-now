@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+"""Standalone script to run the index-now command."""
+import sys
+import os
+
+# Determine the app directory
+script_dir = os.path.dirname(os.path.abspath(__file__))
+# In container, this will be /usr/local/bin, so we use /app
+# During development, use the script's directory
+if script_dir == '/usr/local/bin':
+    app_dir = '/app'
+else:
+    app_dir = script_dir
+
+# Change to the app directory and add it to Python path
+os.chdir(app_dir)
+sys.path.insert(0, app_dir)
+
+# Import and run the CLI
+from app.cli import main
+
+if __name__ == "__main__":
+    # Set argv to simulate running "python -m app.cli index-now"
+    sys.argv = ['index-now', 'index-now']
+    main()

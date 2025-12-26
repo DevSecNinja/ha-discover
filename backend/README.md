@@ -52,7 +52,7 @@ docker run -p 8000:8000 hadiscover-backend
 For running as a one-time indexing job (e.g., Azure Container App Job):
 
 ```bash
-docker run hadiscover-backend index-once
+docker run hadiscover-backend index-now
 ```
 
 This will:
@@ -65,7 +65,7 @@ Perfect for scheduled container jobs that run daily to index repositories.
 ### Quick Deploy Options
 
 - **Docker**: Uses `Dockerfile` with flexible entrypoint
-- **Container App Job**: Can be run with `index-once` argument
+- **Container App Job**: Can be run with `index-now` argument
 
 ### Configuration Files
 
@@ -77,7 +77,7 @@ Perfect for scheduled container jobs that run daily to index repositories.
 ### Environment Variables
 
 - `GITHUB_TOKEN` (optional): GitHub Personal Access Token for higher API rate limits
-- `ENVIRONMENT` (optional): Set to `development` to enable the manual `/index` endpoint trigger. Defaults to `production` which disables the endpoint. In production, use the `index-once` command for scheduled indexing.
+- `ENVIRONMENT` (optional): Set to `development` to enable the manual `/index` endpoint trigger. Defaults to `production` which disables the endpoint. In production, use the `index-now` command for scheduled indexing.
 - `ROOT_PATH` (optional): Base path for the API when deployed behind a reverse proxy or on cloud platforms (e.g., Azure Container Apps). Leave empty for default behavior.
 - `DATABASE_URL` (optional): Database connection URL. Defaults to `sqlite:///./data/hadiscover.db`
 
@@ -123,10 +123,13 @@ In production, the `/index` endpoint is disabled for security. Instead, use the 
 
 ```bash
 # Run as a one-time job
-docker run hadiscover-backend index-once
+docker run hadiscover-backend index-now
 
-# Or using the CLI directly
-python -m app.cli index-once
+# Or exec into a running container (short form)
+docker exec -it <container-id> index-now
+
+# Or exec into a running container (long form)
+docker exec -it <container-id> python -m app.cli index-now
 ```
 
 This is ideal for:
