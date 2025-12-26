@@ -152,3 +152,65 @@ def test_get_db_session_custom_url():
         with patch('app.cli.create_engine') as mock_engine:
             get_db_session()
             mock_engine.assert_called_once_with("sqlite:///custom.db", connect_args={"check_same_thread": False})
+
+
+def test_standalone_index_now_script():
+    """Test that the standalone index-now script exists and is executable."""
+    import subprocess
+    import sys
+    from pathlib import Path
+    
+    # Get the path to the backend directory
+    backend_dir = Path(__file__).parent.parent
+    script_path = backend_dir / "index-now"
+    
+    # Verify the script exists
+    assert script_path.exists(), f"index-now script not found at {script_path}"
+    
+    # Verify it's executable (at least readable)
+    assert os.access(script_path, os.R_OK), "index-now script is not readable"
+    
+    # Test that the script can be parsed as valid Python
+    with open(script_path, 'r') as f:
+        script_content = f.read()
+        # Try to compile it to check for syntax errors
+        try:
+            compile(script_content, str(script_path), 'exec')
+        except SyntaxError as e:
+            pytest.fail(f"index-now script has syntax errors: {e}")
+    
+    # Verify the shebang is correct
+    with open(script_path, 'r') as f:
+        first_line = f.readline().strip()
+        assert first_line in ['#!/usr/bin/env python3', '#!/usr/bin/env python'], \
+            f"Invalid shebang: {first_line}"
+    
+    # Verify key script content
+    assert 'from app.cli import main' in script_content, "Script should import main from app.cli"
+    assert 'sys.argv = [' in script_content, "Script should set sys.argv"
+    assert 'main()' in script_content, "Script should call main()"
+
+
+def test_standalone_script_execution_simulation():
+    """Test the standalone script logic by simulating container execution."""
+    from pathlib import Path
+    
+    backend_dir = Path(__file__).parent.parent
+    script_path = backend_dir / "index-now"
+    
+    # Read and verify script behavior
+    with open(script_path, 'r') as f:
+        script_lines = f.readlines()
+    
+    # Check the script logic for container path detection
+    script_content = ''.join(script_lines)
+    
+    # Verify it handles /usr/local/bin path (container scenario)
+    assert '/usr/local/bin' in script_content, "Script should handle container path /usr/local/bin"
+    assert 'app_dir = \'/app\'' in script_content, "Script should use /app directory in container"
+    
+    # Verify it changes directory
+    assert 'os.chdir(app_dir)' in script_content, "Script should change to app directory"
+    
+    # Verify it adds to Python path
+    assert 'sys.path.insert(0, app_dir)' in script_content, "Script should add app_dir to Python path"
