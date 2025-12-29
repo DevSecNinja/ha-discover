@@ -76,42 +76,15 @@ jobs:
 
   build-and-push-backend:
     needs: [test, determine-version]
-    runs-on: ubuntu-latest
-    outputs:
-      digest: ${{ steps.docker_build.outputs.digest }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}
-          tags: |
-            type=semver,pattern={{version}},value=${{ needs.determine-version.outputs.version }}
-            type=semver,pattern={{major}}.{{minor}},value=${{ needs.determine-version.outputs.version }}
-            type=semver,pattern={{major}},value=${{ needs.determine-version.outputs.version }}
-            type=raw,value=latest
-
-      - name: Update backend version
-        run: .github/scripts/update-backend-version.sh ${{ needs.determine-version.outputs.version }}
-
-      - name: Build and push Docker image
-        id: docker_build
-        uses: docker/build-push-action@v6
-        with:
-          context: ./backend
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+    uses: ./.github/workflows/build-and-push-image.yml
+    with:
+      registry: ${{ env.REGISTRY }}
+      image_name: ${{ env.BACKEND_IMAGE_NAME }}
+      version: ${{ needs.determine-version.outputs.version }}
+      context_path: './backend'
+      update_version_script: 'update-backend-version.sh'
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   scan-backend:
     needs: [build-and-push-backend]
@@ -130,44 +103,17 @@ jobs:
 
   build-and-push-frontend:
     needs: [test, determine-version]
-    runs-on: ubuntu-latest
-    outputs:
-      digest: ${{ steps.docker_build.outputs.digest }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Extract metadata for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}
-          tags: |
-            type=semver,pattern={{version}},value=${{ needs.determine-version.outputs.version }}
-            type=semver,pattern={{major}}.{{minor}},value=${{ needs.determine-version.outputs.version }}
-            type=semver,pattern={{major}},value=${{ needs.determine-version.outputs.version }}
-            type=raw,value=latest
-
-      - name: Update frontend version
-        run: .github/scripts/update-frontend-version.sh ${{ needs.determine-version.outputs.version }}
-
-      - name: Build and push Docker image
-        id: docker_build
-        uses: docker/build-push-action@v6
-        with:
-          context: ./frontend
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            NEXT_PUBLIC_API_URL=${{ vars.FRONTEND_API_URL || 'http://localhost:8000/api/v1' }}
+    uses: ./.github/workflows/build-and-push-image.yml
+    with:
+      registry: ${{ env.REGISTRY }}
+      image_name: ${{ env.FRONTEND_IMAGE_NAME }}
+      version: ${{ needs.determine-version.outputs.version }}
+      context_path: './frontend'
+      update_version_script: 'update-frontend-version.sh'
+      build_args: |
+        NEXT_PUBLIC_API_URL=${{ vars.FRONTEND_API_URL || 'http://localhost:8000/api/v1' }}
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   scan-frontend:
     needs: [build-and-push-frontend]
