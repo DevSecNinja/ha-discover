@@ -48,6 +48,7 @@ export default function Home() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Automation[]>([]);
   const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [statistics, setStatistics] = useState<Statistics | null>(null);
   const [indexing, setIndexing] = useState(false);
   const [isDark, setIsDark] = useState(true);
@@ -670,15 +671,21 @@ Here's my automation YAML:
 
 [Paste your automation YAML here]`;
                       navigator.clipboard.writeText(text);
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
                     }}
                     className="absolute top-4 right-4 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 opacity-0 group-hover:opacity-100"
                     style={{
-                      background: isDark ? 'rgba(109, 40, 217, 0.8)' : 'rgb(109, 40, 217)',
+                      background: copied
+                        ? (isDark ? 'rgba(34, 197, 94, 0.8)' : 'rgb(34, 197, 94)')
+                        : (isDark ? 'rgba(109, 40, 217, 0.8)' : 'rgb(109, 40, 217)'),
                       color: '#ffffff',
-                      border: isDark ? '1px solid rgba(147, 51, 234, 0.3)' : 'none'
+                      border: copied
+                        ? (isDark ? '1px solid rgba(34, 197, 94, 0.3)' : 'none')
+                        : (isDark ? '1px solid rgba(147, 51, 234, 0.3)' : 'none')
                     }}
                   >
-                    📋 Copy
+                    {copied ? '✓ Copied!' : '📋 Copy'}
                   </button>
                 </div>
               </div>
