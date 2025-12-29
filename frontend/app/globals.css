@@ -1,29 +1,98 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-:root {
-  --foreground: #1a1a1a;
-  --background: #ffffff;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --foreground: #ededed;
-    --background: #0a0a0a;
+    --ha-blue: 18 188 242;
+    --purple-primary: 109 40 217;
+    --purple-muted: 88 28 135;
+    --blue-primary: 59 130 246;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Segoe UI', 'Roboto', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@layer utilities {
+  /* Glass morphism effect - Reflect.app inspired */
+  .glass {
+    background: rgba(20, 20, 35, 0.65);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  .glass-dark {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  /* Animated gradient background - Dark mode (Reflect.app style - breathable dark) */
+  .gradient-bg {
+    background: linear-gradient(-45deg, #0f0f1a, #141422, #18152a, #121218, #0f0f1a);
+    background-size: 400% 400%;
+    animation: gradient 20s ease infinite;
+    transition: all 0.5s ease;
+  }
+
+  /* Animated gradient background - Light mode */
+  .gradient-bg-light {
+    background: linear-gradient(-45deg, #f9fafb, #f3f4f6, #f0f1f5, #f5f3ff, #faf5ff);
+    background-size: 400% 400%;
+    animation: gradient 20s ease infinite;
+    transition: all 0.5s ease;
+  }
+
+  /* Subtle radial glow effect */
+  .glow-purple {
+    background: radial-gradient(circle at center, rgba(109, 40, 217, 0.15), transparent 70%);
+  }
+
+  .glow-blue {
+    background: radial-gradient(circle at center, rgba(18, 188, 242, 0.1), transparent 70%);
+  }
+
+  @keyframes gradient {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  /* Shimmer effect for loading */
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.2) 20%,
+      rgba(255, 255, 255, 0.5) 60%,
+      rgba(255, 255, 255, 0)
+    );
+    animation: shimmer 2s infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Courier New', monospace;
+  font-size: 0.875rem;
 }

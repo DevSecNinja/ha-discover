@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "HA Discover - Search Home Assistant Automations",
-  description: "Discover and explore Home Assistant automations from GitHub repositories",
+  title: "hadiscover - Discover Home Assistant Automations",
+  description: "Search and explore powerful Home Assistant automations from the community. Find triggers, actions, and blueprints shared on GitHub.",
 };
 
 export default function RootLayout({
