@@ -71,13 +71,8 @@ jobs:
       - name: Check if prerelease
         id: check_prerelease
         run: |
-          VERSION=$(echo "${{ steps.get_version.outputs.version }}" | grep -oP '\d+\.\d+\.\d+.*')
-          # Check if version contains prerelease identifiers or if manually set
-          if [[ "${{ github.event.inputs.prerelease }}" == "true" ]] || [[ "$VERSION" =~ -alpha|-beta|-rc|-pre ]]; then
-            echo "is_prerelease=true" >> $GITHUB_OUTPUT
-          else
-            echo "is_prerelease=false" >> $GITHUB_OUTPUT
-          fi
+          OUTPUT=$(.github/scripts/check-if-prerelease.sh "${{ steps.get_version.outputs.version }}" "${{ github.event.inputs.prerelease }}")
+          echo "$OUTPUT" >> $GITHUB_OUTPUT
 
   build-and-push-backend:
     needs: [test, determine-version]
@@ -120,43 +115,18 @@ jobs:
 
   scan-backend:
     needs: [build-and-push-backend]
-    runs-on: ubuntu-latest
+    uses: ./.github/workflows/scan-image.yml
+    with:
+      registry: ${{ env.REGISTRY }}
+      image_name: ${{ env.BACKEND_IMAGE_NAME }}
+      digest: ${{ needs.build-and-push-backend.outputs.digest }}
+      category: 'backend-image'
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     permissions:
       contents: read
       packages: read
       security-events: write
-    steps:
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Pull Docker image for scanning
-        run: |
-          IMAGE_NAME=$(echo "${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}" | tr '[:upper:]' '[:lower:]')
-          docker pull ${IMAGE_NAME}@${{ needs.build-and-push-backend.outputs.digest }}
-
-      - name: Generate lowercase image ref
-        id: image_ref
-        run: |
-          IMAGE_REF=$(echo "${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}@${{ needs.build-and-push-backend.outputs.digest }}" | tr '[:upper:]' '[:lower:]')
-          echo "ref=${IMAGE_REF}" >> $GITHUB_OUTPUT
-
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: ${{ steps.image_ref.outputs.ref }}
-          format: 'sarif'
-          output: 'trivy-backend-results.sarif'
-
-      - name: Upload Trivy results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
-        if: always()
-        with:
-          sarif_file: 'trivy-backend-results.sarif'
-          category: 'backend-image'
 
   build-and-push-frontend:
     needs: [test, determine-version]
@@ -201,43 +171,18 @@ jobs:
 
   scan-frontend:
     needs: [build-and-push-frontend]
-    runs-on: ubuntu-latest
+    uses: ./.github/workflows/scan-image.yml
+    with:
+      registry: ${{ env.REGISTRY }}
+      image_name: ${{ env.FRONTEND_IMAGE_NAME }}
+      digest: ${{ needs.build-and-push-frontend.outputs.digest }}
+      category: 'frontend-image'
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     permissions:
       contents: read
       packages: read
       security-events: write
-    steps:
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Pull Docker image for scanning
-        run: |
-          IMAGE_NAME=$(echo "${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}" | tr '[:upper:]' '[:lower:]')
-          docker pull ${IMAGE_NAME}@${{ needs.build-and-push-frontend.outputs.digest }}
-
-      - name: Generate lowercase image ref
-        id: image_ref
-        run: |
-          IMAGE_REF=$(echo "${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}@${{ needs.build-and-push-frontend.outputs.digest }}" | tr '[:upper:]' '[:lower:]')
-          echo "ref=${IMAGE_REF}" >> $GITHUB_OUTPUT
-
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: ${{ steps.image_ref.outputs.ref }}
-          format: 'sarif'
-          output: 'trivy-frontend-results.sarif'
-
-      - name: Upload Trivy results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
-        if: always()
-        with:
-          sarif_file: 'trivy-frontend-results.sarif'
-          category: 'frontend-image'
 
   create-release:
     needs: [determine-version, scan-backend, scan-frontend]

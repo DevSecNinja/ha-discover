@@ -1,0 +1,65 @@
+name: Scan Docker Image
+
+on:
+  workflow_call:
+    inputs:
+      registry:
+        description: 'Container registry URL'
+        required: true
+        type: string
+      image_name:
+        description: 'Full image name (e.g., owner/repo/backend)'
+        required: true
+        type: string
+      digest:
+        description: 'Image digest to scan'
+        required: true
+        type: string
+      category:
+        description: 'Security category for SARIF upload (e.g., backend-image)'
+        required: true
+        type: string
+    secrets:
+      GITHUB_TOKEN:
+        required: true
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ inputs.registry }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull Docker image for scanning
+        run: .github/scripts/pull-docker-image.sh "${{ inputs.registry }}" "${{ inputs.image_name }}" "${{ inputs.digest }}"
+
+      - name: Generate lowercase image ref
+        id: image_ref
+        run: |
+          OUTPUT=$(.github/scripts/generate-lowercase-image-ref.sh "${{ inputs.registry }}" "${{ inputs.image_name }}" "${{ inputs.digest }}")
+          echo "$OUTPUT" >> $GITHUB_OUTPUT
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ steps.image_ref.outputs.ref }}
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+          category: ${{ inputs.category }}
