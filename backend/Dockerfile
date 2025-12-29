@@ -10,6 +10,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
+# Allows to set the node environment
+ARG ENVIRONMENT
+ENV ENVIRONMENT=${ENVIRONMENT:-production}
+
 # Create data directory for SQLite database
 RUN mkdir -p /app/data
 

@@ -13,6 +13,7 @@ services:
     environment:
       # Optional: Add your GitHub token for higher API rate limits
       - GITHUB_TOKEN=${GITHUB_TOKEN:-}
+      - ENVIRONMENT=development
     volumes:
       # Persist database across container restarts
       - api_data:/app/data
