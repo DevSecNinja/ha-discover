@@ -40,6 +40,10 @@ if (!API_BASE_URL) {
   console.error('NEXT_PUBLIC_API_URL environment variable is not set');
 }
 
+if (IS_DEVELOPMENT) {
+  console.info('🚧 Running in development mode');
+}
+
 export default function Home() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Automation[]>([]);

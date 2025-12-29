@@ -17,6 +17,10 @@ COPY . .
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 
+# Allows to set the node environment
+ARG NODE_ENV
+ENV NODE_ENV=${NODE_ENV:-production}
+
 # Remove basePath for Docker deployment (only needed for GitHub Pages)
 RUN sed -i '/basePath:/d' next.config.ts
 
