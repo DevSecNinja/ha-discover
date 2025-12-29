@@ -78,8 +78,8 @@ jobs:
     needs: [test, determine-version]
     uses: ./.github/workflows/build-and-push-image.yml
     with:
-      registry: ${{ env.REGISTRY }}
-      image_name: ${{ env.BACKEND_IMAGE_NAME }}
+      registry: 'ghcr.io'
+      image_name: '${{ github.repository }}/backend'
       version: ${{ needs.determine-version.outputs.version }}
       context_path: './backend'
       update_version_script: 'update-backend-version.sh'
@@ -88,8 +88,8 @@ jobs:
     needs: [build-and-push-backend]
     uses: ./.github/workflows/scan-image.yml
     with:
-      registry: ${{ env.REGISTRY }}
-      image_name: ${{ env.BACKEND_IMAGE_NAME }}
+      registry: 'ghcr.io'
+      image_name: '${{ github.repository }}/backend'
       digest: ${{ needs.build-and-push-backend.outputs.digest }}
       category: 'backend-image'
     permissions:
@@ -101,8 +101,8 @@ jobs:
     needs: [test, determine-version]
     uses: ./.github/workflows/build-and-push-image.yml
     with:
-      registry: ${{ env.REGISTRY }}
-      image_name: ${{ env.FRONTEND_IMAGE_NAME }}
+      registry: 'ghcr.io'
+      image_name: '${{ github.repository }}/frontend'
       version: ${{ needs.determine-version.outputs.version }}
       context_path: './frontend'
       update_version_script: 'update-frontend-version.sh'
@@ -113,8 +113,8 @@ jobs:
     needs: [build-and-push-frontend]
     uses: ./.github/workflows/scan-image.yml
     with:
-      registry: ${{ env.REGISTRY }}
-      image_name: ${{ env.FRONTEND_IMAGE_NAME }}
+      registry: 'ghcr.io'
+      image_name: '${{ github.repository }}/frontend'
       digest: ${{ needs.build-and-push-frontend.outputs.digest }}
       category: 'frontend-image'
     permissions:
