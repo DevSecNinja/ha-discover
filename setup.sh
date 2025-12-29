@@ -110,6 +110,19 @@ else
     echo -e "${GREEN}✓ Frontend dependencies up to date${NC}"
 fi
 
+# Setup .env.local if it doesn't exist
+if [ ! -f ".env.local" ]; then
+    echo "Creating .env.local..."
+    echo "NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1" > .env.local
+    echo -e "${GREEN}✓ .env.local created${NC}"
+elif ! grep -q "NEXT_PUBLIC_API_URL" .env.local; then
+    echo "Adding NEXT_PUBLIC_API_URL to .env.local..."
+    echo "NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1" >> .env.local
+    echo -e "${GREEN}✓ NEXT_PUBLIC_API_URL added to .env.local${NC}"
+else
+    echo -e "${YELLOW}.env.local already configured${NC}"
+fi
+
 cd ..
 echo ""
 
@@ -125,6 +138,7 @@ echo "  ✓ Data directory ready"
 echo ""
 echo "Frontend setup:"
 echo "  ✓ Dependencies installed"
+echo "  ✓ Environment configured (.env.local)"
 echo ""
 echo "You can now start the application with:"
 echo "  ./start.sh"
