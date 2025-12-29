@@ -19,9 +19,6 @@ on:
         description: 'Security category for SARIF upload (e.g., backend-image)'
         required: true
         type: string
-    secrets:
-      GITHUB_TOKEN:
-        required: true
 
 jobs:
   scan:

@@ -32,9 +32,6 @@ on:
       digest:
         description: 'Image digest from the build'
         value: ${{ jobs.build.outputs.digest }}
-    secrets:
-      GITHUB_TOKEN:
-        required: true
 
 jobs:
   build:

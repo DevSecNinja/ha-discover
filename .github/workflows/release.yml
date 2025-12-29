@@ -83,8 +83,6 @@ jobs:
       version: ${{ needs.determine-version.outputs.version }}
       context_path: './backend'
       update_version_script: 'update-backend-version.sh'
-    secrets:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   scan-backend:
     needs: [build-and-push-backend]
@@ -94,8 +92,6 @@ jobs:
       image_name: ${{ env.BACKEND_IMAGE_NAME }}
       digest: ${{ needs.build-and-push-backend.outputs.digest }}
       category: 'backend-image'
-    secrets:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     permissions:
       contents: read
       packages: read
@@ -112,8 +108,6 @@ jobs:
       update_version_script: 'update-frontend-version.sh'
       build_args: |
         NEXT_PUBLIC_API_URL=${{ vars.FRONTEND_API_URL || 'http://localhost:8000/api/v1' }}
-    secrets:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   scan-frontend:
     needs: [build-and-push-frontend]
@@ -123,8 +117,6 @@ jobs:
       image_name: ${{ env.FRONTEND_IMAGE_NAME }}
       digest: ${{ needs.build-and-push-frontend.outputs.digest }}
       category: 'frontend-image'
-    secrets:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     permissions:
       contents: read
       packages: read
