@@ -91,6 +91,7 @@ jobs:
         run: .github/scripts/update-backend-version.sh ${{ needs.determine-version.outputs.version }}
 
       - name: Build and push Docker image
+        id: docker_build
         uses: docker/build-push-action@v6
         with:
           context: ./backend
@@ -98,15 +99,15 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+      - name: Pull Docker image for scanning
+        run: docker pull ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}@${{ steps.docker_build.outputs.digest }}
+
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ needs.determine-version.outputs.version }}
+          image-ref: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}@${{ steps.docker_build.outputs.digest }}
           format: 'sarif'
           output: 'trivy-backend-results.sarif'
-        env:
-          TRIVY_USERNAME: ${{ github.actor }}
-          TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Trivy results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
@@ -144,6 +145,7 @@ jobs:
         run: .github/scripts/update-frontend-version.sh ${{ needs.determine-version.outputs.version }}
 
       - name: Build and push Docker image
+        id: docker_build
         uses: docker/build-push-action@v6
         with:
           context: ./frontend
@@ -153,15 +155,15 @@ jobs:
           build-args: |
             NEXT_PUBLIC_API_URL=${{ vars.FRONTEND_API_URL || 'http://localhost:8000/api/v1' }}
 
+      - name: Pull Docker image for scanning
+        run: docker pull ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}@${{ steps.docker_build.outputs.digest }}
+
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ needs.determine-version.outputs.version }}
+          image-ref: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}@${{ steps.docker_build.outputs.digest }}
           format: 'sarif'
           output: 'trivy-frontend-results.sarif'
-        env:
-          TRIVY_USERNAME: ${{ github.actor }}
-          TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Trivy results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
