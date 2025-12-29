@@ -55,10 +55,10 @@ jobs:
         run: |
           OUTPUT=$(.github/scripts/extract-version.sh "${{ github.event_name }}" "${{ github.event.inputs.version }}" "${{ github.ref }}")
           echo "$OUTPUT" >> $GITHUB_OUTPUT
-          
+
           # Extract version for validation
           VERSION=$(echo "$OUTPUT" | grep "^version=" | cut -d= -f2)
-          
+
           # Validate version format
           .github/scripts/validate-version.sh "$VERSION"
 
@@ -98,6 +98,20 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ needs.determine-version.outputs.version }}
+          format: 'sarif'
+          output: 'trivy-backend-results.sarif'
+
+      - name: Upload Trivy results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-backend-results.sarif'
+          category: 'backend-image'
+
   build-and-push-frontend:
     needs: [test, determine-version]
     runs-on: ubuntu-latest
@@ -136,6 +150,20 @@ jobs:
           build-args: |
             NEXT_PUBLIC_API_URL=${{ vars.FRONTEND_API_URL || 'http://localhost:8000/api/v1' }}
 
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ needs.determine-version.outputs.version }}
+          format: 'sarif'
+          output: 'trivy-frontend-results.sarif'
+
+      - name: Upload Trivy results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-frontend-results.sarif'
+          category: 'frontend-image'
+
   create-release:
     needs: [determine-version, build-and-push-backend, build-and-push-frontend]
     runs-on: ubuntu-latest
@@ -153,23 +181,23 @@ jobs:
           generate_release_notes: true
           body: |
             ## Release ${{ needs.determine-version.outputs.version }}
-            
+
             ### Docker Images
-            
+
             **Backend:**
             ```bash
             docker pull ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:${{ needs.determine-version.outputs.version }}
             ```
-            
+
             **Frontend:**
             ```bash
             docker pull ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ needs.determine-version.outputs.version }}
             ```
-            
+
             ### Using Docker Compose
-            
+
             Update your `docker-compose.yml` to use the released images:
-            
+
             ```yaml
             services:
               backend:
@@ -177,7 +205,7 @@ jobs:
               frontend:
                 image: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:${{ needs.determine-version.outputs.version }}
             ```
-            
+
             See the [RELEASES.md](./RELEASES.md) for more details.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
