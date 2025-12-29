@@ -55,7 +55,7 @@ backend/app/: main.py (FastAPI), cli.py (index-now cmd), version.py, api/routes.
 backend/tests/: 40 pytest tests
 backend/: requirements.txt, pytest.ini, Dockerfile, entrypoint.sh, .env.example
 frontend/app/: page.tsx (search UI), layout.tsx, globals.css
-frontend/: package.json, next.config.ts (static export, basePath:'/ha-discover'), Dockerfile
+frontend/: package.json, next.config.ts (static export, basePath:'/hadiscover'), Dockerfile
 .github/workflows/: docker-test.yml (primary), deploy.yml, release.yml
 Root: README.md, ARCHITECTURE.md, DEPLOYMENT.md, docker-compose.yml
 ```

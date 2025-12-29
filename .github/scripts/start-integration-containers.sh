@@ -14,13 +14,13 @@ fi
 
 echo "Starting backend container..."
 docker run -d \
-  --name ha-discover-backend \
+  --name hadiscover-backend \
   -p 8000:8000 \
   -e ENVIRONMENT=development \
   "${BACKEND_IMAGE}"
 
 echo "Starting frontend container..."
-.github/scripts/start-container.sh ha-discover-frontend "${FRONTEND_IMAGE}" 8080:80
+.github/scripts/start-container.sh hadiscover-frontend "${FRONTEND_IMAGE}" 8080:80
 
 echo "Waiting for both containers to be healthy..."
 sleep 10

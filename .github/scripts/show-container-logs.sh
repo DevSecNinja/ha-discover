@@ -4,8 +4,8 @@
 
 set -e
 
-BACKEND_CONTAINER="${1:-ha-discover-backend}"
-FRONTEND_CONTAINER="${2:-ha-discover-frontend}"
+BACKEND_CONTAINER="${1:-hadiscover-backend}"
+FRONTEND_CONTAINER="${2:-hadiscover-frontend}"
 
 echo "=== Backend logs ==="
 docker logs "${BACKEND_CONTAINER}" 2>&1 || echo "Backend container not found"

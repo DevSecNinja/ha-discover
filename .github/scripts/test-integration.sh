@@ -24,7 +24,7 @@ echo "✓ Frontend accessible"
 
 # Test index-now command in backend container
 echo "Testing index-now command..."
-if docker exec ha-discover-backend which index-now > /dev/null 2>&1; then
+if docker exec hadiscover-backend which index-now > /dev/null 2>&1; then
   echo "✓ index-now command found in PATH"
 else
   echo "✗ index-now command not found in PATH"
@@ -32,7 +32,7 @@ else
 fi
 
 # Test that index-now can be executed
-if docker exec ha-discover-backend timeout 5 index-now 2>&1 | grep -q "Starting indexing job"; then
+if docker exec hadiscover-backend timeout 5 index-now 2>&1 | grep -q "Starting indexing job"; then
   echo "✓ index-now command executes correctly"
 else
   echo "✗ index-now command failed to execute"

@@ -58,7 +58,7 @@ The system follows a traditional three-tier architecture with clear separation b
 
 1. **Trigger**: User clicks "Trigger Re-Index" or scheduled job runs
 2. **Repository Discovery**:
-   - Backend calls GitHub API to search for repositories with `ha-discover` topic
+   - Backend calls GitHub API to search for repositories with `hadiscover` topic
    - Returns list of repository metadata (owner, name, URL, default branch)
 3. **File Discovery**:
    - For each repository, search for automation files in common locations
@@ -106,7 +106,7 @@ The system follows a traditional three-tier architecture with clear separation b
 - Discover automation files using common path patterns
 
 **Key Methods:**
-- `search_repositories()`: Find repos with ha-discover topic
+- `search_repositories()`: Find repos with hadiscover topic
 - `get_file_content()`: Fetch raw file content
 - `find_automation_files()`: Locate automation files in repo
 

@@ -3,7 +3,7 @@
 
 services:
   api:
-    image: ghcr.io/devsecninja/ha-discover/backend:latest
+    image: ghcr.io/devsecninja/hadiscover/backend:latest
     container_name: api
     ports:
       - "8000:8000"
@@ -23,7 +23,7 @@ services:
       start_period: 5s
 
   web:
-    image: ghcr.io/devsecninja/ha-discover/frontend:latest
+    image: ghcr.io/devsecninja/hadiscover/frontend:latest
     container_name: web
     ports:
       - "8080:80"

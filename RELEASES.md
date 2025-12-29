@@ -92,7 +92,7 @@ The release workflow will automatically detect the tag and create a release.
 
 #### Method 2: Manual Workflow Dispatch
 
-1. Go to the [Actions tab](https://github.com/DevSecNinja/ha-discover/actions)
+1. Go to the [Actions tab](https://github.com/DevSecNinja/hadiscover/actions)
 2. Select the "Release" workflow
 3. Click "Run workflow"
 4. Enter the version number (e.g., `0.1.0`) without the `v` prefix
@@ -114,8 +114,8 @@ Docker images are automatically built and pushed to GitHub Container Registry du
 
 ### Available Images
 
-- **Backend**: `ghcr.io/devsecninja/ha-discover/backend`
-- **Frontend**: `ghcr.io/devsecninja/ha-discover/frontend`
+- **Backend**: `ghcr.io/devsecninja/hadiscover/backend`
+- **Frontend**: `ghcr.io/devsecninja/hadiscover/frontend`
 
 ### Image Tags
 
@@ -130,12 +130,12 @@ Each release creates the following tags:
 
 ```bash
 # Pull the latest version
-docker pull ghcr.io/devsecninja/ha-discover/backend:latest
-docker pull ghcr.io/devsecninja/ha-discover/frontend:latest
+docker pull ghcr.io/devsecninja/hadiscover/backend:latest
+docker pull ghcr.io/devsecninja/hadiscover/frontend:latest
 
 # Pull a specific version
-docker pull ghcr.io/devsecninja/ha-discover/backend:0.1.0
-docker pull ghcr.io/devsecninja/ha-discover/frontend:0.1.0
+docker pull ghcr.io/devsecninja/hadiscover/backend:0.1.0
+docker pull ghcr.io/devsecninja/hadiscover/frontend:0.1.0
 ```
 
 ### Using Images with Docker Compose
@@ -153,11 +153,11 @@ Or modify `docker-compose.yml` to use the image tags:
 ```yaml
 services:
   api:
-    image: ghcr.io/devsecninja/ha-discover/backend:latest
+    image: ghcr.io/devsecninja/hadiscover/backend:latest
     # ... rest of config
 
   web:
-    image: ghcr.io/devsecninja/ha-discover/frontend:latest
+    image: ghcr.io/devsecninja/hadiscover/frontend:latest
     # ... rest of config
 ```
 
@@ -241,7 +241,7 @@ GitHub releases automatically generate release notes from merged pull requests a
 
 ### Release Workflow Fails
 
-1. Check the [Actions tab](https://github.com/DevSecNinja/ha-discover/actions) for error details
+1. Check the [Actions tab](https://github.com/DevSecNinja/hadiscover/actions) for error details
 2. Ensure all tests pass locally before creating a release
 3. Verify that GitHub Actions has permission to write to GHCR
 
@@ -284,18 +284,18 @@ npm version 0.1.1 --no-git-tag-version
 ```bash
 # Backend
 cd backend
-docker build -t ghcr.io/devsecninja/ha-discover/backend:0.1.1 .
-docker push ghcr.io/devsecninja/ha-discover/backend:0.1.1
+docker build -t ghcr.io/devsecninja/hadiscover/backend:0.1.1 .
+docker push ghcr.io/devsecninja/hadiscover/backend:0.1.1
 
 # Frontend
 cd frontend
-docker build -t ghcr.io/devsecninja/ha-discover/frontend:0.1.1 .
-docker push ghcr.io/devsecninja/ha-discover/frontend:0.1.1
+docker build -t ghcr.io/devsecninja/hadiscover/frontend:0.1.1 .
+docker push ghcr.io/devsecninja/hadiscover/frontend:0.1.1
 ```
 
 ### 3. Create GitHub Release
 
-1. Go to [Releases](https://github.com/DevSecNinja/ha-discover/releases)
+1. Go to [Releases](https://github.com/DevSecNinja/hadiscover/releases)
 2. Click "Draft a new release"
 3. Create a new tag (e.g., `v0.1.1`)
 4. Write release notes
@@ -303,4 +303,4 @@ docker push ghcr.io/devsecninja/ha-discover/frontend:0.1.1
 
 ## Support
 
-For questions or issues with the release process, please [open an issue](https://github.com/DevSecNinja/ha-discover/issues).
+For questions or issues with the release process, please [open an issue](https://github.com/DevSecNinja/hadiscover/issues).

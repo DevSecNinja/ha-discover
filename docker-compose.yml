@@ -2,7 +2,7 @@ services:
   api:
     # Use the image from GHCR (recommended for production)
     # Uncomment the line below and comment the build line to use pre-built images
-    # image: ghcr.io/devsecninja/ha-discover/backend:latest
+    # image: ghcr.io/devsecninja/hadiscover/backend:latest
 
     # Or build locally (for development)
     build: ./backend
@@ -29,7 +29,7 @@ services:
   web:
     # Use the image from GHCR (recommended for production)
     # Uncomment the line below and comment the build line to use pre-built images
-    # image: ghcr.io/devsecninja/ha-discover/frontend:latest
+    # image: ghcr.io/devsecninja/hadiscover/frontend:latest
 
     # Or build locally (for development)
     build:

@@ -27,28 +27,28 @@ jobs:
           context: ./backend
           push: false
           load: true
-          tags: ha-discover-backend:test
+          tags: hadiscover-backend:test
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Test backend container starts
         run: |
-          .github/scripts/start-backend-container.sh ha-discover-backend ha-discover-backend:test 8000
-          .github/scripts/wait-for-healthy.sh ha-discover-backend 60
+          .github/scripts/start-backend-container.sh hadiscover-backend hadiscover-backend:test 8000
+          .github/scripts/wait-for-healthy.sh hadiscover-backend 60
 
       - name: Test backend API endpoints
         run: .github/scripts/test-backend-api.sh 8000
 
       - name: Test index-now command
-        run: .github/scripts/test-index-now.sh ha-discover-backend
+        run: .github/scripts/test-index-now.sh hadiscover-backend
 
       - name: Show backend logs on failure
         if: failure()
-        run: docker logs ha-discover-backend
+        run: docker logs hadiscover-backend
 
       - name: Cleanup backend container
         if: always()
-        run: .github/scripts/cleanup-containers.sh ha-discover-backend
+        run: .github/scripts/cleanup-containers.sh hadiscover-backend
 
   test-frontend:
     runs-on: ubuntu-latest
@@ -65,7 +65,7 @@ jobs:
           context: ./frontend
           push: false
           load: true
-          tags: ha-discover-frontend:test
+          tags: hadiscover-frontend:test
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
@@ -73,19 +73,19 @@ jobs:
 
       - name: Test frontend container starts
         run: |
-          .github/scripts/start-container.sh ha-discover-frontend ha-discover-frontend:test 8080:80
-          .github/scripts/wait-for-healthy.sh ha-discover-frontend 60
+          .github/scripts/start-container.sh hadiscover-frontend hadiscover-frontend:test 8080:80
+          .github/scripts/wait-for-healthy.sh hadiscover-frontend 60
 
       - name: Test frontend web server
         run: .github/scripts/test-frontend.sh 8080
 
       - name: Show frontend logs on failure
         if: failure()
-        run: docker logs ha-discover-frontend
+        run: docker logs hadiscover-frontend
 
       - name: Cleanup frontend container
         if: always()
-        run: .github/scripts/cleanup-containers.sh ha-discover-frontend
+        run: .github/scripts/cleanup-containers.sh hadiscover-frontend
 
   integration-test:
     runs-on: ubuntu-latest
@@ -103,7 +103,7 @@ jobs:
           context: ./backend
           push: false
           load: true
-          tags: ha-discover-backend:test
+          tags: hadiscover-backend:test
           cache-from: type=gha
 
       - name: Build frontend Docker image
@@ -112,21 +112,21 @@ jobs:
           context: ./frontend
           push: false
           load: true
-          tags: ha-discover-frontend:test
+          tags: hadiscover-frontend:test
           cache-from: type=gha
           build-args: |
             NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
 
       - name: Start both containers
-        run: .github/scripts/start-integration-containers.sh ha-discover-backend:test ha-discover-frontend:test
+        run: .github/scripts/start-integration-containers.sh hadiscover-backend:test hadiscover-frontend:test
 
       - name: Test integration
         run: .github/scripts/test-integration.sh
 
       - name: Show logs on failure
         if: failure()
-        run: .github/scripts/show-container-logs.sh ha-discover-backend ha-discover-frontend
+        run: .github/scripts/show-container-logs.sh hadiscover-backend hadiscover-frontend
 
       - name: Cleanup
         if: always()
-        run: .github/scripts/cleanup-containers.sh ha-discover-backend ha-discover-frontend
+        run: .github/scripts/cleanup-containers.sh hadiscover-backend hadiscover-frontend

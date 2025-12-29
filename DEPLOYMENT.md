@@ -114,7 +114,7 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  basePath: '/ha-discover',  // Repository subdirectory path
+  basePath: '/hadiscover',  // Repository subdirectory path
 };
 ```
 
