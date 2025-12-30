@@ -24,6 +24,13 @@ RUN chmod +x /app/entrypoint.sh
 RUN chmod +x /app/index-now && \
     cp /app/index-now /usr/local/bin/index-now
 
+# Create non-root user and change ownership
+RUN useradd -m -u 1000 appuser && \
+    chown -R appuser:appuser /app
+
+# Switch to non-root user
+USER appuser
+
 # Expose port
 EXPOSE 8000
 
