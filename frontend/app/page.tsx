@@ -907,7 +907,7 @@ export default function Home() {
                 }}
               >
                 Add the topic to your repository to share your automations with
-                the community!
+                the community! (It may take up to an hour to appear)
               </p>
             </div>
           </div>

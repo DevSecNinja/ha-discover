@@ -5,6 +5,7 @@ import os
 
 from app.api.routes import router
 from app.models import init_db
+from app.services.scheduler import SchedulerService
 from app.version import __version__
 from dotenv import load_dotenv
 from fastapi import FastAPI
@@ -30,6 +31,9 @@ app = FastAPI(
     version=__version__,
     root_path=root_path,
 )
+
+# Initialize scheduler service (will be started in startup event)
+scheduler_service = None
 
 # Configure CORS for frontend
 app.add_middleware(
@@ -57,9 +61,26 @@ app.include_router(router, prefix=api_prefix)
 
 @app.on_event("startup")
 async def startup_event():
-    """Initialize database on startup."""
+    """Initialize database and scheduler on startup."""
+    global scheduler_service
+
     init_db()
     logging.info("Database initialized")
+
+    # Start the scheduler for hourly indexing
+    scheduler_service = SchedulerService()
+    scheduler_service.start()
+    logging.info("Scheduler initialized - hourly indexing enabled")
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Shutdown scheduler gracefully."""
+    global scheduler_service
+
+    if scheduler_service:
+        scheduler_service.shutdown()
+        logging.info("Scheduler shut down")
 
 
 @app.get("/")
