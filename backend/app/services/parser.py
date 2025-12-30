@@ -1,4 +1,5 @@
 """Parser for Home Assistant automation YAML files."""
+
 import logging
 from typing import List, Dict, Any, Optional
 import yaml
@@ -8,31 +9,31 @@ logger = logging.getLogger(__name__)
 
 class AutomationParser:
     """Parser for Home Assistant automation YAML files."""
-    
+
     @staticmethod
     def parse_automation_file(content: str) -> List[Dict[str, Any]]:
         """
         Parse a YAML file containing Home Assistant automations.
-        
+
         This is a best-effort parser that extracts automation metadata.
         It handles various YAML structures gracefully.
-        
+
         Args:
             content: YAML file content as string
-            
+
         Returns:
             List of automation dictionaries with extracted metadata
         """
         automations = []
-        
+
         try:
             # Parse YAML content
             data = yaml.safe_load(content)
-            
+
             if data is None:
                 logger.warning("Empty YAML content")
                 return automations
-            
+
             # Handle different YAML structures
             if isinstance(data, list):
                 # Direct list of automations
@@ -49,111 +50,125 @@ class AutomationParser:
             else:
                 logger.warning(f"Unexpected YAML structure: {type(data)}")
                 return automations
-            
+
             # Extract metadata from each automation
             for idx, auto in enumerate(automations_list):
                 if not isinstance(auto, dict):
                     logger.warning(f"Skipping non-dict automation at index {idx}")
                     continue
-                
+
                 parsed = AutomationParser._parse_single_automation(auto)
                 if parsed:
                     automations.append(parsed)
-            
+
             logger.info("Parsed %d automations from YAML", len(automations))
-            
+
         except yaml.YAMLError as e:
             logger.error(f"YAML parsing error: {e}")
         except Exception as e:
             logger.error(f"Unexpected error parsing automations: {e}")
-        
+
         return automations
-    
+
     @staticmethod
-    def _parse_single_automation(automation: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    def _parse_single_automation(
+        automation: Dict[str, Any],
+    ) -> Optional[Dict[str, Any]]:
         """
         Extract metadata from a single automation dictionary.
-        
+
         Args:
             automation: Dictionary representing one automation
-            
+
         Returns:
             Parsed automation metadata, or None if invalid
         """
         try:
             # Extract alias/name (required for meaningful display)
-            alias = automation.get("alias") or automation.get("name") or automation.get("id")
-            
+            alias = (
+                automation.get("alias")
+                or automation.get("name")
+                or automation.get("id")
+            )
+
             # Extract description
             description = automation.get("description", "")
-            
+
             # Extract trigger types (best effort)
-            trigger_types = AutomationParser._extract_trigger_types(automation.get("trigger", []))
-            
+            trigger_types = AutomationParser._extract_trigger_types(
+                automation.get("trigger", [])
+            )
+
             # Extract blueprint information
             blueprint_info = AutomationParser._extract_blueprint_info(automation)
-            
+
             # Extract action calls (services used)
-            action_calls = AutomationParser._extract_action_calls(automation.get("action", []))
-            
+            action_calls = AutomationParser._extract_action_calls(
+                automation.get("action", [])
+            )
+
             return {
                 "alias": alias,
                 "description": description,
                 "trigger_types": trigger_types,
-                "blueprint_path": blueprint_info.get("path") if blueprint_info else None,
-                "blueprint_input": blueprint_info.get("input") if blueprint_info else None,
+                "blueprint_path": (
+                    blueprint_info.get("path") if blueprint_info else None
+                ),
+                "blueprint_input": (
+                    blueprint_info.get("input") if blueprint_info else None
+                ),
                 "action_calls": action_calls,
             }
-            
+
         except Exception as e:
             logger.warning(f"Error parsing single automation: {e}")
             return None
-    
+
     @staticmethod
     def _extract_trigger_types(triggers: Any) -> List[str]:
         """
         Extract trigger types from automation triggers.
-        
+
         Triggers can be a single dict or a list of dicts.
         Each trigger typically has a 'platform' key.
-        
+
         Args:
             triggers: Trigger configuration (dict or list)
-            
+
         Returns:
             List of unique trigger types
         """
         trigger_types = []
-        
+
         try:
             # Normalize to list
             if isinstance(triggers, dict):
                 triggers = [triggers]
             elif not isinstance(triggers, list):
                 return trigger_types
-            
+
             # Extract platform from each trigger
             for trigger in triggers:
                 if isinstance(trigger, dict):
                     platform = trigger.get("platform")
                     if platform and platform not in trigger_types:
                         trigger_types.append(platform)
-        
+
         except Exception as e:
             logger.warning(f"Error extracting trigger types: {e}")
-        
+
         return trigger_types
-    
+
     @staticmethod
     def _extract_blueprint_info(automation: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """
         Extract blueprint information from automation.
-        
+
         Automations using blueprints have a 'use_blueprint' key with path and input.
-        
+
         Args:
             automation: Automation dictionary
-            
+
         Returns:
             Dictionary with blueprint path and input, or None if not a blueprint
         """
@@ -162,46 +177,46 @@ class AutomationParser:
             if use_blueprint and isinstance(use_blueprint, dict):
                 return {
                     "path": use_blueprint.get("path", ""),
-                    "input": use_blueprint.get("input", {})
+                    "input": use_blueprint.get("input", {}),
                 }
         except Exception as e:
             logger.warning(f"Error extracting blueprint info: {e}")
-        
+
         return None
-    
+
     @staticmethod
     def _extract_action_calls(actions: Any) -> List[str]:
         """
         Extract service calls from automation actions.
-        
+
         Actions can be a single dict or a list of dicts.
         Each action may have a 'service' key.
-        
+
         Args:
             actions: Action configuration (dict or list)
-            
+
         Returns:
             List of unique service calls (e.g., 'light.turn_on')
         """
         action_calls_set = set()
-        
+
         try:
             # Normalize to list
             if isinstance(actions, dict):
                 actions = [actions]
             elif not isinstance(actions, list):
                 return []
-            
+
             # Extract service calls recursively
             def extract_from_action(action: Dict[str, Any]) -> None:
                 if not isinstance(action, dict):
                     return
-                
+
                 # Direct service call
                 service = action.get("service")
                 if service:
                     action_calls_set.add(service)
-                
+
                 # Check for nested actions (choose, if/then/else, repeat, etc.)
                 for key in ["then", "else", "sequence", "default"]:
                     nested = action.get(key)
@@ -211,7 +226,7 @@ class AutomationParser:
                                 extract_from_action(nested_action)
                         elif isinstance(nested, dict):
                             extract_from_action(nested)
-                
+
                 # Handle choose actions
                 choose = action.get("choose")
                 if isinstance(choose, list):
@@ -221,11 +236,11 @@ class AutomationParser:
                             if isinstance(sequence, list):
                                 for seq_action in sequence:
                                     extract_from_action(seq_action)
-            
+
             for action in actions:
                 extract_from_action(action)
-        
+
         except Exception as e:
             logger.warning(f"Error extracting action calls: {e}")
-        
+
         return list(action_calls_set)

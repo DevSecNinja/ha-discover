@@ -1,4 +1,5 @@
 """Main FastAPI application for hadiscover."""
+
 import logging
 import os
 from fastapi import FastAPI
@@ -14,8 +15,7 @@ load_dotenv()
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 
 # Get root_path from environment variable
@@ -28,7 +28,7 @@ app = FastAPI(
     title="hadiscover API",
     description="Search engine for Home Assistant automations from GitHub",
     version=__version__,
-    root_path=root_path
+    root_path=root_path,
 )
 
 # Configure CORS for frontend
@@ -39,7 +39,7 @@ app.add_middleware(
         "http://127.0.0.1:8080",
         "https://hadiscover.com",
         "https://www.hadiscover.com",
-        "https://api.hadiscover.com"
+        "https://api.hadiscover.com",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -65,13 +65,10 @@ async def startup_event():
 @app.get("/")
 async def root():
     """Root endpoint."""
-    return {
-        "message": "hadiscover API",
-        "version": __version__,
-        "docs": "/docs"
-    }
+    return {"message": "hadiscover API", "version": __version__, "docs": "/docs"}
 
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)

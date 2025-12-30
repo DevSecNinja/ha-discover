@@ -1,4 +1,5 @@
 """Search service for querying Home Assistant automations."""
+
 import logging
 from typing import List, Dict, Any
 from sqlalchemy.orm import Session
@@ -13,7 +14,9 @@ class SearchService:
     """Service for searching Home Assistant automations."""
 
     @staticmethod
-    def search_automations(db: Session, query: str, limit: int = 50) -> List[Dict[str, Any]]:
+    def search_automations(
+        db: Session, query: str, limit: int = 50
+    ) -> List[Dict[str, Any]]:
         """
         Search automations by text query across multiple fields.
 
@@ -33,41 +36,67 @@ class SearchService:
             # Perform case-insensitive search across multiple fields
             search_pattern = f"%{query}%"
 
-            results = db.query(Automation, Repository).join(
-                Repository, Automation.repository_id == Repository.id
-            ).filter(
-                or_(
-                    func.lower(Automation.alias).like(func.lower(search_pattern)),
-                    func.lower(Automation.description).like(func.lower(search_pattern)),
-                    func.lower(Automation.trigger_types).like(func.lower(search_pattern)),
-                    func.lower(Repository.owner).like(func.lower(search_pattern)),
-                    func.lower(Repository.name).like(func.lower(search_pattern)),
-                    func.lower(Repository.description).like(func.lower(search_pattern))
+            results = (
+                db.query(Automation, Repository)
+                .join(Repository, Automation.repository_id == Repository.id)
+                .filter(
+                    or_(
+                        func.lower(Automation.alias).like(func.lower(search_pattern)),
+                        func.lower(Automation.description).like(
+                            func.lower(search_pattern)
+                        ),
+                        func.lower(Automation.trigger_types).like(
+                            func.lower(search_pattern)
+                        ),
+                        func.lower(Repository.owner).like(func.lower(search_pattern)),
+                        func.lower(Repository.name).like(func.lower(search_pattern)),
+                        func.lower(Repository.description).like(
+                            func.lower(search_pattern)
+                        ),
+                    )
                 )
-            ).limit(limit).all()
+                .limit(limit)
+                .all()
+            )
 
             # Format results
             formatted_results = []
             for automation, repository in results:
-                formatted_results.append({
-                    "id": automation.id,
-                    "alias": automation.alias,
-                    "description": automation.description,
-                    "trigger_types": automation.trigger_types.split(",") if automation.trigger_types else [],
-                    "blueprint_path": automation.blueprint_path,
-                    "action_calls": automation.action_calls.split(",") if automation.action_calls else [],
-                    "source_file_path": automation.source_file_path,
-                    "github_url": automation.github_url,
-                    "repository": {
-                        "name": repository.name,
-                        "owner": repository.owner,
-                        "description": repository.description,
-                        "url": repository.url
-                    },
-                    "indexed_at": automation.indexed_at.isoformat() if automation.indexed_at else None
-                })
+                formatted_results.append(
+                    {
+                        "id": automation.id,
+                        "alias": automation.alias,
+                        "description": automation.description,
+                        "trigger_types": (
+                            automation.trigger_types.split(",")
+                            if automation.trigger_types
+                            else []
+                        ),
+                        "blueprint_path": automation.blueprint_path,
+                        "action_calls": (
+                            automation.action_calls.split(",")
+                            if automation.action_calls
+                            else []
+                        ),
+                        "source_file_path": automation.source_file_path,
+                        "github_url": automation.github_url,
+                        "repository": {
+                            "name": repository.name,
+                            "owner": repository.owner,
+                            "description": repository.description,
+                            "url": repository.url,
+                        },
+                        "indexed_at": (
+                            automation.indexed_at.isoformat()
+                            if automation.indexed_at
+                            else None
+                        ),
+                    }
+                )
 
-            logger.info(f"Search query '{query}' returned {len(formatted_results)} results")
+            logger.info(
+                f"Search query '{query}' returned {len(formatted_results)} results"
+            )
             return formatted_results
 
         except Exception as e:
@@ -87,29 +116,47 @@ class SearchService:
             List of recent automations
         """
         try:
-            results = db.query(Automation, Repository).join(
-                Repository, Automation.repository_id == Repository.id
-            ).order_by(func.random()).limit(limit).all()
+            results = (
+                db.query(Automation, Repository)
+                .join(Repository, Automation.repository_id == Repository.id)
+                .order_by(func.random())
+                .limit(limit)
+                .all()
+            )
 
             formatted_results = []
             for automation, repository in results:
-                formatted_results.append({
-                    "id": automation.id,
-                    "alias": automation.alias,
-                    "description": automation.description,
-                    "trigger_types": automation.trigger_types.split(",") if automation.trigger_types else [],
-                    "blueprint_path": automation.blueprint_path,
-                    "action_calls": automation.action_calls.split(",") if automation.action_calls else [],
-                    "source_file_path": automation.source_file_path,
-                    "github_url": automation.github_url,
-                    "repository": {
-                        "name": repository.name,
-                        "owner": repository.owner,
-                        "description": repository.description,
-                        "url": repository.url
-                    },
-                    "indexed_at": automation.indexed_at.isoformat() if automation.indexed_at else None
-                })
+                formatted_results.append(
+                    {
+                        "id": automation.id,
+                        "alias": automation.alias,
+                        "description": automation.description,
+                        "trigger_types": (
+                            automation.trigger_types.split(",")
+                            if automation.trigger_types
+                            else []
+                        ),
+                        "blueprint_path": automation.blueprint_path,
+                        "action_calls": (
+                            automation.action_calls.split(",")
+                            if automation.action_calls
+                            else []
+                        ),
+                        "source_file_path": automation.source_file_path,
+                        "github_url": automation.github_url,
+                        "repository": {
+                            "name": repository.name,
+                            "owner": repository.owner,
+                            "description": repository.description,
+                            "url": repository.url,
+                        },
+                        "indexed_at": (
+                            automation.indexed_at.isoformat()
+                            if automation.indexed_at
+                            else None
+                        ),
+                    }
+                )
 
             return formatted_results
 
@@ -134,11 +181,8 @@ class SearchService:
 
             return {
                 "total_repositories": repo_count or 0,
-                "total_automations": automation_count or 0
+                "total_automations": automation_count or 0,
             }
         except Exception as e:
             logger.error(f"Error getting statistics: {e}")
-            return {
-                "total_repositories": 0,
-                "total_automations": 0
-            }
+            return {"total_repositories": 0, "total_automations": 0}

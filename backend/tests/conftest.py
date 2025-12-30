@@ -1,4 +1,5 @@
 """Test fixtures and configuration."""
+
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -68,5 +69,5 @@ def sample_repo_data():
         "owner": "testuser",
         "description": "My Home Assistant configuration",
         "url": "https://github.com/testuser/home-assistant-config",
-        "default_branch": "main"
+        "default_branch": "main",
     }

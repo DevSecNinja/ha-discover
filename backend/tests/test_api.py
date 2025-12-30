@@ -1,4 +1,5 @@
 """Tests for API endpoints."""
+
 from fastapi.testclient import TestClient
 from app.main import app
 
@@ -26,7 +27,7 @@ def test_search_endpoint_no_query():
     client = TestClient(app)
     response = client.get("/api/v1/search")
     assert response.status_code == 200
-    
+
     data = response.json()
     assert data["query"] == ""
 
@@ -36,7 +37,7 @@ def test_search_endpoint_structure():
     client = TestClient(app)
     response = client.get("/api/v1/search?q=test")
     assert response.status_code == 200
-    
+
     data = response.json()
     assert "query" in data
     assert "results" in data
@@ -49,7 +50,7 @@ def test_statistics_endpoint_structure():
     client = TestClient(app)
     response = client.get("/api/v1/statistics")
     assert response.status_code == 200
-    
+
     data = response.json()
     assert "total_repositories" in data
     assert "total_automations" in data
@@ -60,16 +61,16 @@ def test_statistics_endpoint_structure():
 def test_index_endpoint():
     """Test index trigger endpoint in development mode."""
     import os
-    
+
     # Save original environment and set to development
     original_env = os.environ.get("ENVIRONMENT")
     os.environ["ENVIRONMENT"] = "development"
-    
+
     try:
         client = TestClient(app)
         response = client.post("/api/v1/index")
         assert response.status_code == 200
-        
+
         data = response.json()
         assert "message" in data
         assert "started" in data
@@ -85,16 +86,16 @@ def test_index_endpoint():
 def test_index_endpoint_blocked_in_production():
     """Test that index endpoint is blocked in production."""
     import os
-    
+
     # Save original environment and set to production
     original_env = os.environ.get("ENVIRONMENT")
     os.environ["ENVIRONMENT"] = "production"
-    
+
     try:
         client = TestClient(app)
         response = client.post("/api/v1/index")
         assert response.status_code == 403
-        
+
         data = response.json()
         assert "detail" in data
         assert "not available in production" in data["detail"].lower()

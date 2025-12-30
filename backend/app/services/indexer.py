@@ -1,4 +1,5 @@
 """Indexing service for discovering and storing Home Assistant automations."""
+
 import logging
 from typing import List
 from sqlalchemy.orm import Session
@@ -32,7 +33,7 @@ class IndexingService:
             "repositories_found": 0,
             "repositories_indexed": 0,
             "automations_indexed": 0,
-            "errors": 0
+            "errors": 0,
         }
 
         try:
@@ -50,7 +51,9 @@ class IndexingService:
                     else:
                         stats["errors"] += 1
                 except Exception as e:
-                    logger.error(f"Error indexing repository {repo_data['owner']}/{repo_data['name']}: {e}")
+                    logger.error(
+                        f"Error indexing repository {repo_data['owner']}/{repo_data['name']}: {e}"
+                    )
                     stats["errors"] += 1
 
             logger.info(f"Indexing complete: {stats}")
@@ -98,7 +101,7 @@ class IndexingService:
                     name=name,
                     owner=owner,
                     description=repo_data.get("description", ""),
-                    url=url
+                    url=url,
                 )
                 db.add(repository)
                 logger.info(f"Adding new repository: {owner}/{name}")
@@ -108,7 +111,9 @@ class IndexingService:
             db.refresh(repository)
 
             # Find automation files
-            automation_files = await self.github_service.find_automation_files(owner, name, branch)
+            automation_files = await self.github_service.find_automation_files(
+                owner, name, branch
+            )
 
             if not automation_files:
                 logger.warning(f"No automation files found in {owner}/{name}")
@@ -117,10 +122,14 @@ class IndexingService:
 
             # Process each automation file
             for file_path in automation_files:
-                content = await self.github_service.get_file_content(owner, name, file_path, branch)
+                content = await self.github_service.get_file_content(
+                    owner, name, file_path, branch
+                )
 
                 if not content:
-                    logger.warning(f"Could not fetch content for {owner}/{name}/{file_path}")
+                    logger.warning(
+                        f"Could not fetch content for {owner}/{name}/{file_path}"
+                    )
                     continue
 
                 # Parse automations
@@ -136,14 +145,16 @@ class IndexingService:
                         action_calls=",".join(auto_data.get("action_calls", [])),
                         source_file_path=file_path,
                         github_url=f"{url}/blob/{branch}/{file_path}",
-                        repository_id=repository.id
+                        repository_id=repository.id,
                     )
                     db.add(automation)
                     result["automations_count"] += 1
 
             db.commit()
             result["success"] = True
-            logger.info(f"Indexed {result['automations_count']} automations from {owner}/{name}")
+            logger.info(
+                f"Indexed {result['automations_count']} automations from {owner}/{name}"
+            )
 
         except Exception as e:
             logger.error(f"Error indexing repository {owner}/{name}: {e}")

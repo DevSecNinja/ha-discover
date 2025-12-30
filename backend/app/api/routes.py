@@ -1,4 +1,5 @@
 """API routes for HA Discover."""
+
 import logging
 import os
 from typing import List, Optional
@@ -13,9 +14,11 @@ from app.services.indexer import IndexingService
 
 logger = logging.getLogger(__name__)
 
+
 def is_development() -> bool:
     """Check if running in development mode."""
     return os.getenv("ENVIRONMENT", "production") == "development"
+
 
 router = APIRouter()
 
@@ -27,6 +30,7 @@ INDEXING_COOLDOWN_MINUTES = 10
 # Pydantic models for API
 class RepositoryResponse(BaseModel):
     """Repository information in API response."""
+
     name: str
     owner: str
     description: Optional[str]
@@ -35,6 +39,7 @@ class RepositoryResponse(BaseModel):
 
 class AutomationResponse(BaseModel):
     """Automation search result."""
+
     id: int
     alias: Optional[str]
     description: Optional[str]
@@ -49,6 +54,7 @@ class AutomationResponse(BaseModel):
 
 class SearchResponse(BaseModel):
     """Search API response."""
+
     query: str
     results: List[AutomationResponse]
     count: int
@@ -56,18 +62,21 @@ class SearchResponse(BaseModel):
 
 class StatisticsResponse(BaseModel):
     """Statistics API response."""
+
     total_repositories: int
     total_automations: int
 
 
 class IndexResponse(BaseModel):
     """Indexing operation response."""
+
     message: str
     started: bool
 
 
 class IndexStatusResponse(BaseModel):
     """Indexing status response."""
+
     repositories_found: int
     repositories_indexed: int
     automations_indexed: int
@@ -76,9 +85,7 @@ class IndexStatusResponse(BaseModel):
 
 @router.get("/search", response_model=SearchResponse)
 async def search_automations(
-    q: str = "",
-    limit: int = 50,
-    db: Session = Depends(get_db)
+    q: str = "", limit: int = 50, db: Session = Depends(get_db)
 ):
     """
     Search for Home Assistant automations.
@@ -96,11 +103,7 @@ async def search_automations(
 
     results = SearchService.search_automations(db, q, limit)
 
-    return {
-        "query": q,
-        "results": results,
-        "count": len(results)
-    }
+    return {"query": q, "results": results, "count": len(results)}
 
 
 @router.get("/statistics", response_model=StatisticsResponse)
@@ -120,8 +123,7 @@ async def get_statistics(db: Session = Depends(get_db)):
 
 @router.post("/index", response_model=IndexResponse)
 async def trigger_indexing(
-    background_tasks: BackgroundTasks,
-    db: Session = Depends(get_db)
+    background_tasks: BackgroundTasks, db: Session = Depends(get_db)
 ):
     """
     Trigger indexing of repositories with hadiscover or ha-discover topics.
@@ -143,7 +145,7 @@ async def trigger_indexing(
     if not is_development():
         raise HTTPException(
             status_code=403,
-            detail="This endpoint is not available in production. Indexing runs on a daily schedule."
+            detail="This endpoint is not available in production. Indexing runs on a daily schedule.",
         )
 
     global last_indexing_time
@@ -160,7 +162,7 @@ async def trigger_indexing(
 
             raise HTTPException(
                 status_code=429,
-                detail=f"Indexing rate limit exceeded. Please wait {remaining_minutes}m {remaining_seconds}s before triggering again."
+                detail=f"Indexing rate limit exceeded. Please wait {remaining_minutes}m {remaining_seconds}s before triggering again.",
             )
 
     # Update last indexing time
@@ -171,6 +173,7 @@ async def trigger_indexing(
         indexer = IndexingService()
         # Create a new session for background task
         from app.models import SessionLocal
+
         bg_db = SessionLocal()
         try:
             await indexer.index_repositories(bg_db)
@@ -181,7 +184,7 @@ async def trigger_indexing(
 
     return {
         "message": "Indexing started in background. Refresh your browser to see the changes once complete.",
-        "started": True
+        "started": True,
     }
 
 

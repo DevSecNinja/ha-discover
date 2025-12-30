@@ -7,8 +7,8 @@ import os
 script_dir = os.path.dirname(os.path.abspath(__file__))
 # In container, this will be /usr/local/bin, so we use /app
 # During development, use the script's directory
-if script_dir == '/usr/local/bin':
-    app_dir = '/app'
+if script_dir == "/usr/local/bin":
+    app_dir = "/app"
 else:
     app_dir = script_dir
 
@@ -21,5 +21,5 @@ from app.cli import main
 
 if __name__ == "__main__":
     # Set argv to simulate running "python -m app.cli index-now"
-    sys.argv = ['index-now', 'index-now']
+    sys.argv = ["index-now", "index-now"]
     main()
