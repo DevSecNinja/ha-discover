@@ -16,40 +16,38 @@ def migrate_database(db_path: str = "./data/hadiscover.db"):
         return True
 
     try:
-        conn = sqlite3.connect(db_path)
-        cursor = conn.cursor()
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
 
-        # Check if columns already exist
-        cursor.execute("PRAGMA table_info(automations)")
-        columns = [row[1] for row in cursor.fetchall()]
+            # Check if columns already exist
+            cursor.execute("PRAGMA table_info(automations)")
+            columns = [row[1] for row in cursor.fetchall()]
 
-        migrations_needed = []
-        if "start_line" not in columns:
-            migrations_needed.append("start_line")
-        if "end_line" not in columns:
-            migrations_needed.append("end_line")
+            migrations_needed = []
+            if "start_line" not in columns:
+                migrations_needed.append("start_line")
+            if "end_line" not in columns:
+                migrations_needed.append("end_line")
 
-        if not migrations_needed:
-            print("✓ Database already has line number columns")
-            return True
+            if not migrations_needed:
+                print("✓ Database already has line number columns")
+                return True
 
-        print(f"Adding columns: {', '.join(migrations_needed)}")
+            print(f"Adding columns: {', '.join(migrations_needed)}")
 
-        # Add columns
-        if "start_line" not in columns:
-            cursor.execute("ALTER TABLE automations ADD COLUMN start_line INTEGER")
-            print("✓ Added start_line column")
+            # Add columns
+            if "start_line" not in columns:
+                cursor.execute("ALTER TABLE automations ADD COLUMN start_line INTEGER")
+                print("✓ Added start_line column")
 
-        if "end_line" not in columns:
-            cursor.execute("ALTER TABLE automations ADD COLUMN end_line INTEGER")
-            print("✓ Added end_line column")
+            if "end_line" not in columns:
+                cursor.execute("ALTER TABLE automations ADD COLUMN end_line INTEGER")
+                print("✓ Added end_line column")
 
-        conn.commit()
-        conn.close()
+            conn.commit()
 
         print("✓ Database migration completed successfully")
         return True
-
     except Exception as e:
         print(f"✗ Migration failed: {e}", file=sys.stderr)
         return False
