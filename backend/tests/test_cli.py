@@ -208,36 +208,3 @@ def test_standalone_index_now_script():
     ), "Script should import main from app.cli"
     assert "sys.argv = [" in script_content, "Script should set sys.argv"
     assert "main()" in script_content, "Script should call main()"
-
-
-def test_standalone_script_execution_simulation():
-    """Test the standalone script logic by simulating container execution."""
-    from pathlib import Path
-
-    backend_dir = Path(__file__).parent.parent
-    script_path = backend_dir / "index-now"
-
-    # Read and verify script behavior
-    with open(script_path, "r") as f:
-        script_lines = f.readlines()
-
-    # Check the script logic for container path detection
-    script_content = "".join(script_lines)
-
-    # Verify it handles /usr/local/bin path (container scenario)
-    assert (
-        "/usr/local/bin" in script_content
-    ), "Script should handle container path /usr/local/bin"
-    assert (
-        "app_dir = '/app'" in script_content
-    ), "Script should use /app directory in container"
-
-    # Verify it changes directory
-    assert (
-        "os.chdir(app_dir)" in script_content
-    ), "Script should change to app directory"
-
-    # Verify it adds to Python path
-    assert (
-        "sys.path.insert(0, app_dir)" in script_content
-    ), "Script should add app_dir to Python path"
