@@ -664,7 +664,7 @@ export default function Home() {
                       className="block group/title"
                     >
                       <h3
-                        className="text-2xl font-semibold mb-2 group-hover/title:text-[rgb(var(--ha-blue))] transition-colors truncate"
+                        className="text-2xl font-semibold mb-2 group-hover/title:text-[rgb(var(--ha-blue))] transition-colors line-clamp-2"
                         style={{
                           color: isDark ? "#e0e7ff" : "#1f2937",
                         }}
