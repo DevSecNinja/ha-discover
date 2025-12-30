@@ -124,7 +124,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.determine-version.outputs.version_tag }}
-          name: Release ${{ needs.determine-version.outputs.version }}
+          name: ${{ needs.determine-version.outputs.version }}
           draft: false
           prerelease: ${{ needs.determine-version.outputs.is_prerelease == 'true' }}
           generate_release_notes: true
