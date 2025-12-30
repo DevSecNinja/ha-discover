@@ -10,6 +10,21 @@ import httpx
 logger = logging.getLogger(__name__)
 
 
+class GitHubRateLimitError(Exception):
+    """Raised when GitHub API returns a rate limit or backoff signal."""
+
+    def __init__(self, message: str, retry_after: Optional[int] = None):
+        """
+        Initialize the error.
+
+        Args:
+            message: Error message
+            retry_after: Number of seconds to wait before retrying (from Retry-After header)
+        """
+        super().__init__(message)
+        self.retry_after = retry_after
+
+
 class GitHubService:
     """Service for interacting with GitHub API."""
 
@@ -57,6 +72,20 @@ class GitHubService:
                         response = await client.get(
                             url, headers=self.headers, params=params, timeout=30.0
                         )
+
+                        # Check for rate limiting (status 429 or 403 with rate limit message)
+                        if response.status_code == 429 or (
+                            response.status_code == 403
+                            and "rate limit" in response.text.lower()
+                        ):
+                            retry_after = response.headers.get("Retry-After")
+                            retry_seconds = int(retry_after) if retry_after else None
+                            message = f"GitHub API rate limit exceeded for search_repositories"
+                            if retry_seconds:
+                                message += f". Retry after {retry_seconds} seconds"
+                            logger.warning(message)
+                            raise GitHubRateLimitError(message, retry_after=retry_seconds)
+
                         response.raise_for_status()
 
                         data = response.json()
@@ -129,6 +158,18 @@ class GitHubService:
                     logger.debug(f"File not found: {owner}/{repo}/{path}")
                     return None
 
+                # Check for rate limiting
+                if response.status_code == 429 or (
+                    response.status_code == 403 and "rate limit" in response.text.lower()
+                ):
+                    retry_after = response.headers.get("Retry-After")
+                    retry_seconds = int(retry_after) if retry_after else None
+                    message = f"GitHub API rate limit exceeded for get_file_content"
+                    if retry_seconds:
+                        message += f". Retry after {retry_seconds} seconds"
+                    logger.warning(message)
+                    raise GitHubRateLimitError(message, retry_after=retry_seconds)
+
                 response.raise_for_status()
                 data = response.json()
 
@@ -177,6 +218,19 @@ class GitHubService:
                     response = await client.get(
                         url, headers=self.headers, params=params, timeout=30.0
                     )
+
+                    # Check for rate limiting
+                    if response.status_code == 429 or (
+                        response.status_code == 403
+                        and "rate limit" in response.text.lower()
+                    ):
+                        retry_after = response.headers.get("Retry-After")
+                        retry_seconds = int(retry_after) if retry_after else None
+                        message = f"GitHub API rate limit exceeded for find_automation_files"
+                        if retry_seconds:
+                            message += f". Retry after {retry_seconds} seconds"
+                        logger.warning(message)
+                        raise GitHubRateLimitError(message, retry_after=retry_seconds)
 
                     if response.status_code == 200:
                         found_files.append(path)

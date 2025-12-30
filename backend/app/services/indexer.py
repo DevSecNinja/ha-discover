@@ -1,10 +1,11 @@
 """Indexing service for discovering and storing Home Assistant automations."""
 
 import logging
+from datetime import datetime
 from typing import List
 
-from app.models.database import Automation, Repository
-from app.services.github_service import GitHubService
+from app.models.database import Automation, IndexingMetadata, Repository
+from app.services.github_service import GitHubRateLimitError, GitHubService
 from app.services.parser import AutomationParser
 from sqlalchemy.orm import Session
 
@@ -34,6 +35,7 @@ class IndexingService:
             "repositories_indexed": 0,
             "automations_indexed": 0,
             "errors": 0,
+            "rate_limited": False,
         }
 
         try:
@@ -50,19 +52,76 @@ class IndexingService:
                         stats["automations_indexed"] += result["automations_count"]
                     else:
                         stats["errors"] += 1
+                except GitHubRateLimitError as e:
+                    logger.warning(
+                        f"Rate limit hit while indexing repository {repo_data['owner']}/{repo_data['name']}: {e}"
+                    )
+                    stats["rate_limited"] = True
+                    stats["errors"] += 1
+                    # Stop indexing when rate limited
+                    break
                 except Exception as e:
                     logger.error(
                         f"Error indexing repository {repo_data['owner']}/{repo_data['name']}: {e}"
                     )
                     stats["errors"] += 1
 
-            logger.info(f"Indexing complete: {stats}")
+            # Only store completion timestamp if indexing was not rate limited
+            if not stats["rate_limited"]:
+                self._store_completion_timestamp(db)
+                logger.info("Indexing completed successfully")
+            else:
+                logger.warning(
+                    "Indexing halted due to rate limiting. Completion timestamp not stored."
+                )
 
+            logger.info(f"Indexing stats: {stats}")
+
+        except GitHubRateLimitError as e:
+            logger.error(f"Rate limit hit during repository search: {e}")
+            stats["rate_limited"] = True
+            stats["errors"] += 1
         except Exception as e:
             logger.error(f"Error in indexing process: {e}")
             stats["errors"] += 1
 
         return stats
+
+    def _store_completion_timestamp(self, db: Session) -> None:
+        """
+        Store the completion timestamp of a successful indexing run.
+
+        Args:
+            db: Database session
+        """
+        try:
+            # Check if metadata record exists
+            metadata = (
+                db.query(IndexingMetadata)
+                .filter_by(key="last_completed_at")
+                .first()
+            )
+
+            current_time = datetime.utcnow()
+
+            if metadata:
+                # Update existing record
+                metadata.value = current_time.isoformat()
+                metadata.updated_at = current_time
+            else:
+                # Create new record
+                metadata = IndexingMetadata(
+                    key="last_completed_at",
+                    value=current_time.isoformat(),
+                    updated_at=current_time,
+                )
+                db.add(metadata)
+
+            db.commit()
+            logger.info(f"Stored indexing completion timestamp: {current_time.isoformat()}")
+        except Exception as e:
+            logger.error(f"Error storing completion timestamp: {e}")
+            db.rollback()
 
     async def _index_repository(self, db: Session, repo_data: dict) -> dict:
         """
@@ -156,6 +215,10 @@ class IndexingService:
                 f"Indexed {result['automations_count']} automations from {owner}/{name}"
             )
 
+        except GitHubRateLimitError:
+            # Propagate rate limit errors to halt indexing
+            db.rollback()
+            raise
         except Exception as e:
             logger.error(f"Error indexing repository {owner}/{name}: {e}")
             db.rollback()

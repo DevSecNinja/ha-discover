@@ -57,3 +57,17 @@ class Automation(Base):
 
     def __repr__(self):
         return f"<Automation(alias='{self.alias}', repo_id={self.repository_id})>"
+
+
+class IndexingMetadata(Base):
+    """Tracks metadata about indexing operations."""
+
+    __tablename__ = "indexing_metadata"
+
+    id = Column(Integer, primary_key=True, index=True)
+    key = Column(String(255), nullable=False, unique=True)
+    value = Column(Text, nullable=True)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return f"<IndexingMetadata(key='{self.key}', value='{self.value}')>"
