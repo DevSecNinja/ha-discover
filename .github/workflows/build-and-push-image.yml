@@ -68,6 +68,16 @@ jobs:
             type=semver,pattern={{major}}.{{minor}},value=${{ inputs.version }}
             type=semver,pattern={{major}},value=${{ inputs.version }}
             type=raw,value=latest,enable=${{ inputs.is_prerelease != 'true' }}
+          labels: |
+            org.opencontainers.image.title=hadiscover
+            org.opencontainers.image.description=A search engine for Home Assistant automations hosted on GitHub
+            org.opencontainers.image.url=https://hadiscover.com
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.version=${{ inputs.version }}
+            org.opencontainers.image.created=${{ steps.meta.outputs.created }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.licenses=MIT
+            org.opencontainers.image.vendor=DevSecNinja
 
       - name: Update version
         run: .github/scripts/${{ inputs.update_version_script }} ${{ inputs.version }}
