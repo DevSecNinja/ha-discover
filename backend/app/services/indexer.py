@@ -165,9 +165,9 @@ class IndexingService:
                 db.add(repository)
                 logger.info(f"Adding new repository: {owner}/{name}")
 
-            # Commit to get repository ID
-            db.commit()
-            db.refresh(repository)
+            # Flush to get repository ID without committing
+            # This allows us to rollback if rate limiting occurs
+            db.flush()
 
             # Find automation files
             automation_files = await self.github_service.find_automation_files(
@@ -176,6 +176,8 @@ class IndexingService:
 
             if not automation_files:
                 logger.warning(f"No automation files found in {owner}/{name}")
+                # Commit the repository even if no automations found
+                db.commit()
                 result["success"] = True  # Still consider it successful
                 return result
 
@@ -209,6 +211,7 @@ class IndexingService:
                     db.add(automation)
                     result["automations_count"] += 1
 
+            # Only commit if all GitHub API calls succeeded
             db.commit()
             result["success"] = True
             logger.info(
