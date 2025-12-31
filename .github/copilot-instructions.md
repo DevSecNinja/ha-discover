@@ -2,6 +2,14 @@
 
 **hadiscover** is a Home Assistant automation search engine - a full-stack app with Python/FastAPI backend (SQLite), Next.js/TypeScript frontend, ~50 files, 40 backend tests. Indexes `automations.yaml` from GitHub repos with `hadiscover` topic.
 
+## Project Overview
+
+- **Purpose**: Search engine for discovering Home Assistant automations shared on GitHub
+- **Stack**: Python 3.12+ (FastAPI), Next.js 14 (TypeScript), SQLite database
+- **Architecture**: RESTful API backend, static-export frontend, Docker-based deployment
+- **Key Features**: Full-text search, GitHub API integration, automated indexing, opt-in via topics
+- **Documentation**: See README.md (user guide), ARCHITECTURE.md (technical details), DEPLOYMENT.md (hosting)
+
 ## Backend (Python/FastAPI) - Python 3.12+
 
 **Setup** (first time):
@@ -18,6 +26,8 @@ pip install --upgrade pip && pip install -r requirements.txt
 
 **Environment** (optional): `GITHUB_TOKEN` for rate limits, `ENVIRONMENT=development` enables `/api/v1/index` endpoint
 
+**Code Style**: Black formatter (line length 88), isort for imports (Black profile). Run `black .` and `isort .` before committing.
+
 ## Frontend (Next.js/TypeScript) - Node.js 18+
 
 **Setup**: `cd frontend && npm install`
@@ -27,6 +37,8 @@ pip install --upgrade pip && pip install -r requirements.txt
 **Dev server**: `npm run dev` at http://localhost:8080
 
 **Environment** (optional): `NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1` in `.env.local`
+
+**Code Style**: Biome formatter/linter (configured in `/biome.json`). TypeScript strict mode enabled. Use functional components with hooks.
 
 ## Docker Testing
 
@@ -89,9 +101,46 @@ Root: README.md, ARCHITECTURE.md, DEPLOYMENT.md, docker-compose.yml
 
 ## Pre-Commit Validation
 
-**Backend**: Run `pytest tests/ -v` (all 40 pass), check syntax, verify imports at top (PEP 8)
+**Backend**: Run `pytest tests/ -v` (all 40 pass), format with `black .` and `isort .`, verify imports at top (PEP 8)
 **Frontend**: Run `npm run build` (completes successfully), check TypeScript compiles, verify rendering
 **Before merge**: All GitHub workflows pass (especially docker-test.yml), no new security issues, docs updated if needed
+
+## Code Conventions
+
+**Python**:
+- Use type hints for function signatures
+- Docstrings for modules, classes, and public functions (Google style)
+- async/await for I/O operations (GitHub API, database)
+- Imports: stdlib, third-party, local (separated by blank lines)
+- Error handling: Log errors, continue gracefully (best-effort parsing)
+
+**TypeScript**:
+- Strict mode enabled; explicit types for props and state
+- Client components: Mark with "use client" directive
+- Interfaces for data structures (see page.tsx for examples)
+- Async functions for API calls with try/catch error handling
+- Use Tailwind utility classes for styling
+
+**Database**:
+- SQLAlchemy ORM models in `backend/app/models/`
+- Migrations: Manual (MVP scope; add Alembic if schema changes frequently)
+- Tables: `repositories` (GitHub repos), `automations` (parsed YAML entries)
+- Foreign keys: `automations.repository_id` → `repositories.id`
+
+## Security Considerations
+
+- **No secrets in code**: Use environment variables (see `.env.example`)
+- **CORS**: Whitelist only known origins in `app/main.py`
+- **Rate limiting**: `/api/v1/index` limited to once per 10min (in-memory tracker)
+- **Input validation**: FastAPI Pydantic models validate API inputs
+- **GitHub token**: Optional; use personal access tokens (classic) with minimal scopes
+- **SQL injection**: Protected by SQLAlchemy ORM parameterization
+
+## Dependency Management
+
+**Backend**: `requirements.txt` (pip). Run `pip install -r requirements.txt` after updates. Renovate bot auto-creates PRs.
+**Frontend**: `package.json` (npm). Run `npm install` after updates. Renovate bot auto-creates PRs.
+**Updates**: Review Renovate PRs; CI tests must pass before merge. Check CHANGELOG if major version bumps.
 
 ## Workflow Scripts
 
