@@ -216,3 +216,70 @@ def test_parse_automation_with_line_numbers():
     for auto in automations:
         assert auto["start_line"] is not None
         assert auto["end_line"] is not None
+
+
+def test_parse_automation_line_numbers_accuracy():
+    """Test that line numbers are accurate and end_line is not off by one."""
+    # Create a YAML with known line numbers (no blank lines between automations)
+    # This matches typical Home Assistant automation files
+    yaml_content = """- alias: "First Automation"
+  description: "Lines 1-6"
+  trigger:
+    platform: state
+  action:
+    service: test
+- alias: "Second Automation"
+  description: "Lines 7-12"
+  trigger:
+    platform: time
+  action:
+    service: test2
+"""
+    parser = AutomationParser()
+    automations = parser.parse_automation_file(yaml_content)
+
+    assert len(automations) == 2
+
+    # First automation should be lines 1-6
+    assert automations[0]["alias"] == "First Automation"
+    assert automations[0]["start_line"] == 1
+    assert automations[0]["end_line"] == 6
+
+    # Second automation should be lines 7-12
+    assert automations[1]["alias"] == "Second Automation"
+    assert automations[1]["start_line"] == 7
+    assert automations[1]["end_line"] == 12
+
+
+def test_parse_automation_line_numbers_with_blank_lines():
+    """Test that line numbers handle blank lines between automations."""
+    # Create a YAML with blank lines (some files have this style)
+    yaml_content = """- alias: "First Automation"
+  description: "Lines 1-6, blank line 7"
+  trigger:
+    platform: state
+  action:
+    service: test
+
+- alias: "Second Automation"
+  description: "Lines 8-12"
+  trigger:
+    platform: time
+  action:
+    service: test2
+"""
+    parser = AutomationParser()
+    automations = parser.parse_automation_file(yaml_content)
+
+    assert len(automations) == 2
+
+    # First automation content is lines 1-6, blank line at 7
+    # end_mark points to the blank line, which is acceptable
+    assert automations[0]["alias"] == "First Automation"
+    assert automations[0]["start_line"] == 1
+    assert automations[0]["end_line"] in [6, 7]  # Either is acceptable
+
+    # Second automation should be lines 8-12
+    assert automations[1]["alias"] == "Second Automation"
+    assert automations[1]["start_line"] == 8
+    assert automations[1]["end_line"] in [12, 13]  # Either is acceptable
