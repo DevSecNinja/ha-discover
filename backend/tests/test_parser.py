@@ -330,3 +330,57 @@ actions:
     assert len(automations) == 1
     assert automations[0]["alias"] == "Complex trigger format"
     assert "state" in automations[0]["trigger_types"]
+
+
+def test_parse_automation_with_actions_using_action_key():
+    """Test parsing automation where action items use 'action' key instead of 'service'."""
+    yaml_with_action_key = """
+alias: "Newer action format"
+description: "Uses 'action' key instead of 'service' within action items"
+trigger:
+  - platform: state
+    entity_id: sensor.test
+actions:
+  - action: light.turn_on
+    target:
+      entity_id: light.living_room
+  - action: notify.mobile_app
+    data:
+      message: "Test notification"
+  - action: media_player.media_pause
+"""
+    parser = AutomationParser()
+    automations = parser.parse_automation_file(yaml_with_action_key)
+
+    assert len(automations) == 1
+    assert automations[0]["alias"] == "Newer action format"
+    assert len(automations[0]["action_calls"]) == 3
+    assert "light.turn_on" in automations[0]["action_calls"]
+    assert "notify.mobile_app" in automations[0]["action_calls"]
+    assert "media_player.media_pause" in automations[0]["action_calls"]
+
+
+def test_parse_automation_with_actions_plural():
+    """Test parsing automation using 'actions' (plural) instead of 'action'."""
+    yaml_with_actions = """
+alias: "Automation with actions (plural)"
+description: "Uses actions: instead of action:"
+trigger:
+  - platform: state
+    entity_id: sensor.test
+actions:
+  - action: light.turn_on
+    target:
+      entity_id: light.living_room
+  - action: notify.mobile_app
+    data:
+      message: "Test message"
+"""
+    parser = AutomationParser()
+    automations = parser.parse_automation_file(yaml_with_actions)
+
+    assert len(automations) == 1
+    assert automations[0]["alias"] == "Automation with actions (plural)"
+    assert len(automations[0]["action_calls"]) == 2
+    assert "light.turn_on" in automations[0]["action_calls"]
+    assert "notify.mobile_app" in automations[0]["action_calls"]
