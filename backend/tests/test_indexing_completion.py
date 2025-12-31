@@ -1,13 +1,14 @@
 """Tests for indexing completion timestamp functionality."""
 
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import pytest
 from app.models.database import Base, IndexingMetadata
-from app.services.indexer import IndexingService
 from app.services.github_service import GitHubRateLimitError
+from app.services.indexer import IndexingService
 from app.services.search_service import SearchService
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from unittest.mock import AsyncMock, MagicMock, patch
 
 
 @pytest.fixture

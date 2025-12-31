@@ -1,12 +1,13 @@
 """Tests for database consistency when rate limiting occurs during indexing."""
 
+from unittest.mock import AsyncMock, patch
+
 import pytest
 from app.models.database import Automation, Base, Repository
 from app.services.github_service import GitHubRateLimitError
 from app.services.indexer import IndexingService
 from sqlalchemy import create_engine, func
 from sqlalchemy.orm import sessionmaker
-from unittest.mock import AsyncMock, patch
 
 
 @pytest.fixture
@@ -40,8 +41,12 @@ async def test_rate_limit_on_empty_db_keeps_zero_counts(test_db):
         repo_count = test_db.query(func.count(Repository.id)).scalar()
         automation_count = test_db.query(func.count(Automation.id)).scalar()
 
-        assert repo_count == 0, "Database should have 0 repositories after rate limit on empty DB"
-        assert automation_count == 0, "Database should have 0 automations after rate limit on empty DB"
+        assert (
+            repo_count == 0
+        ), "Database should have 0 repositories after rate limit on empty DB"
+        assert (
+            automation_count == 0
+        ), "Database should have 0 automations after rate limit on empty DB"
 
 
 @pytest.mark.asyncio
@@ -108,10 +113,12 @@ async def test_rate_limit_during_indexing_keeps_accurate_counts(test_db):
             final_repo_count = test_db.query(func.count(Repository.id)).scalar()
             final_automation_count = test_db.query(func.count(Automation.id)).scalar()
 
-            assert final_repo_count == initial_repo_count, \
-                f"Repository count should remain {initial_repo_count}, but got {final_repo_count}"
-            assert final_automation_count == initial_automation_count, \
-                f"Automation count should remain {initial_automation_count}, but got {final_automation_count}"
+            assert (
+                final_repo_count == initial_repo_count
+            ), f"Repository count should remain {initial_repo_count}, but got {final_repo_count}"
+            assert (
+                final_automation_count == initial_automation_count
+            ), f"Automation count should remain {initial_automation_count}, but got {final_automation_count}"
 
 
 @pytest.mark.asyncio
@@ -152,5 +159,9 @@ async def test_rate_limit_on_file_content_fetch(test_db):
                 repo_count = test_db.query(func.count(Repository.id)).scalar()
                 automation_count = test_db.query(func.count(Automation.id)).scalar()
 
-                assert repo_count == 0, "Database should have 0 repositories when rate limited during file fetch"
-                assert automation_count == 0, "Database should have 0 automations when rate limited during file fetch"
+                assert (
+                    repo_count == 0
+                ), "Database should have 0 repositories when rate limited during file fetch"
+                assert (
+                    automation_count == 0
+                ), "Database should have 0 automations when rate limited during file fetch"

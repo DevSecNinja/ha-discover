@@ -1,8 +1,9 @@
 """Tests for GitHub API rate limit handling."""
 
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import pytest
 from app.services.github_service import GitHubRateLimitError, GitHubService
-from unittest.mock import AsyncMock, MagicMock, patch
 
 
 @pytest.mark.asyncio

@@ -185,9 +185,7 @@ class SearchService:
 
             # Get last indexed timestamp
             last_indexed = (
-                db.query(IndexingMetadata)
-                .filter_by(key="last_completed_at")
-                .first()
+                db.query(IndexingMetadata).filter_by(key="last_completed_at").first()
             )
 
             return {
