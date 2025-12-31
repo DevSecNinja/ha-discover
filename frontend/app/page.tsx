@@ -216,7 +216,8 @@ export default function Home() {
         minute: "2-digit",
         timeZoneName: "short",
       });
-    } catch (e) {
+    } catch (error) {
+      console.error("Error formatting date:", error);
       return null;
     }
   };
