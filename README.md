@@ -1,242 +1,137 @@
 # hadiscover
 
-**hadiscover** is a search engine for Home Assistant automations hosted on GitHub. It allows you to discover, explore, and learn from automations created by the Home Assistant community.
+A search engine for discovering Home Assistant automations shared on GitHub.
 
-## What is hadiscover?
+[Try it now at hadiscover.com](https://hadiscover.com/)
 
-hadiscover indexes Home Assistant automation files from GitHub repositories that opt in by adding the `hadiscover` topic to their repository. It provides a simple, searchable interface to find automations by name, description, trigger types, or related repositories.
+## What is it?
 
-Think of it as a specialized search engine for Home Assistant configurations—similar to how kubesearch.dev works for Kubernetes resources, but focused specifically on Home Assistant automations.
+hadiscover indexes Home Assistant automation files from GitHub repositories that opt in by adding the `hadiscover` topic. Search by name, description, trigger types, or repository to find real-world automation examples.
 
-[Try it out now!](https://hadiscover.com/)
+## Why use it?
 
-## Why hadiscover?
-
-Home Assistant users often create sophisticated automations and share them on GitHub, but discovering these automations can be challenging. hadiscover solves this by:
-
-- **Centralizing Discovery**: Aggregating automations from multiple repositories into one searchable index
-- **Facilitating Learning**: Helping users learn from real-world automation examples
-- **Promoting Sharing**: Encouraging the community to share their automations by making them easily discoverable
-- **Opt-in Design**: Respecting privacy by only indexing repositories that explicitly opt in
+- **Discover**: Find automations from the Home Assistant community in one place
+- **Learn**: See how others solve similar automation challenges
+- **Share**: Make your automations discoverable by adding the `hadiscover` topic
+- **Privacy**: Opt-in only—your repos are indexed only if you add the topic
 
 ## Features
 
-- 🔍 **Full-text Search**: Search automations by name, description, trigger types, and repository information
-- 📊 **Statistics Dashboard**: View total repositories and automations indexed
-- 🔄 **Automated Indexing**: Daily scheduled indexing to discover newly added repositories (manual trigger available in development mode)
-- 🔗 **Direct GitHub Links**: Every automation links directly to its source on GitHub
-- 🎨 **Modern UI**: Clean, responsive interface built with Next.js and Tailwind CSS
-- ⚡ **Fast API**: RESTful API powered by FastAPI for quick searches
-- 🐳 **Docker Ready**: Pre-built Docker images available via GitHub Container Registry
-- 🔧 **Auto-Updates**: Renovate bot keeps dependencies automatically up-to-date
+- Full-text search across automations and repositories
+- Filter by trigger types, blueprints, and repositories
+- Direct GitHub links with precise line numbers
+- Hourly automated indexing for fresh results
+- Modern responsive UI with dark mode
+- RESTful API with OpenAPI documentation
 
-## How It Works
+## Adding Your Repository
 
-1. **Repository Discovery**: hadiscover searches GitHub for repositories with the `hadiscover` topic
-2. **Automation Extraction**: For each repository, it locates automation files (e.g., `automations.yaml`)
-3. **Parsing**: Automations are parsed using best-effort YAML parsing to extract metadata
-4. **Indexing**: Automations are stored in a SQLite database with full-text search capability
-5. **Search Interface**: Users can search through the indexed automations via a web UI
+To have your automations indexed:
 
-## Getting Started
+1. Ensure your repository has an `automations.yaml` file
+2. Add the `hadiscover` topic to your GitHub repository:
+   - Go to your repository on GitHub
+   - Click the ⚙️ icon next to "About"
+   - Add `hadiscover` to the topics list
+   - Save changes
+3. Wait for the next hourly indexing (or trigger manually in development mode)
 
-### Quick Start with Docker
+---
 
-The easiest way to run hadiscover is using Docker:
+## Development
+
+### Prerequisites
+
+- Python 3.12+, pip, venv
+- Node.js 18+, npm
+- Optional: GitHub Personal Access Token (for 5k/hr rate limit vs 60/hr)
+
+### Quick Setup
 
 ```bash
-# Using pre-built images from GitHub Container Registry
+git clone https://github.com/DevSecNinja/hadiscover.git
+cd hadiscover
+
+# Automated setup (installs backend and frontend dependencies)
+./setup.sh
+
+# Start both backend and frontend
+./start.sh
+```
+
+Access the app:
+
+- **Frontend**: <http://localhost:8080>
+- **Backend API**: <http://localhost:8000>
+- **API Docs**: <http://localhost:8000/docs>
+
+Stop services:
+
+```bash
+./stop.sh
+```
+
+### Manual Setup
+
+If you prefer manual setup or the scripts don't work:
+
+**Backend:**
+
+```bash
+cd backend
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python -m uvicorn app.main:app --reload
+```
+
+**Frontend (new terminal):**
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+### Docker Deployment
+
+```bash
+# Pre-built images from GHCR
 docker-compose -f docker-compose.prod.yml up -d
 
 # Or build locally
 docker-compose up -d
 ```
 
-The application will be available at:
+### Testing
 
-- **Frontend**: <http://localhost:8080>
-- **Backend API**: <http://localhost:8000>
-- **API Documentation**: <http://localhost:8000/docs>
-
-### Adding Your Repository
-
-To have your Home Assistant configuration indexed:
-
-1. Ensure your repository contains automation files (e.g., `automations.yaml`)
-2. Add the `hadiscover` topic to your GitHub repository:
-   - Go to your repository on GitHub
-   - Click the ⚙️ icon next to "About"
-   - Add `hadiscover` to the topics list
-   - Save changes
-3. Wait for the next scheduled indexing (runs daily at 2 AM UTC) or trigger it manually in development mode
-
-## Develop a new feature
-
-### Prerequisites
-
-- **Backend**: Python 3.12+, pip
-- **Frontend**: Node.js 18+, npm
-- **Optional**: GitHub Personal Access Token (for higher API rate limits)
-
-### Running Locally
-
-#### 1. Clone the Repository
+Run backend tests:
 
 ```bash
-git clone https://github.com/DevSecNinja/hadiscover.git
-cd hadiscover
+cd backend && source venv/bin/activate && pytest tests/ -v
 ```
 
-#### 2. Set Up the Backend
+CI automatically tests Docker containers, API endpoints, and integration on every PR.
 
-```bash
-cd backend
+### API Documentation
 
-# Create and activate virtual environment
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+OpenAPI/Swagger docs available at <http://localhost:8000/docs> once running.
 
-# Install dependencies
-pip install -r requirements.txt
+**Key Endpoints:**
 
-# (Optional) Configure environment variables
-cp .env.example .env
-# Edit .env to add your GITHUB_TOKEN if desired
-
-# Run the backend server
-python -m uvicorn app.main:app --reload
-```
-
-The API will be available at `http://localhost:8000`
-
-#### 3. Set Up the Frontend
-
-Open a new terminal:
-
-```bash
-cd frontend
-
-# Install dependencies
-npm install
-
-# (Optional) Configure environment variables
-cp .env.local.example .env.local
-
-# Run the development server
-npm run dev
-```
-
-The web UI will be available at `http://localhost:8080`
-
-#### 4. Trigger Indexing
-
-1. Open your browser to `http://localhost:8080`
-2. Click the "Trigger Re-Index" button to start discovering repositories
-3. Wait a few moments, then refresh to see the results
-
-## API Documentation
-
-The backend API is documented with OpenAPI/Swagger. Once the backend is running, visit:
-
-- **Swagger UI**: `http://localhost:8000/docs`
-- **ReDoc**: `http://localhost:8000/redoc`
-
-### Key Endpoints
-
-- `GET /api/v1/search?q={query}` - Search for automations
-- `GET /api/v1/statistics` - Get indexing statistics
-- `POST /api/v1/index` - Trigger repository indexing (rate limited to once per 10 minutes)
+- `GET /api/v1/search?q={query}` - Search automations (with filters for repo, blueprint, trigger)
+- `GET /api/v1/statistics` - Get totals and last indexed time
+- `POST /api/v1/index` - Trigger indexing (dev mode only, rate limited)
 - `GET /api/v1/health` - Health check
 
-## Testing
+## More Information
 
-### Backend Tests
+- **Architecture**: See [ARCHITECTURE.md](./ARCHITECTURE.md) for technical details
+- **Contributing**: PRs welcome! Open an issue for bugs or feature requests
+- **License**: MIT License
+- **Stack**: FastAPI (Python), Next.js (TypeScript), SQLite
+- **Inspired by**: [kubesearch.dev](https://kubesearch.dev)
 
-```bash
-cd backend
-source venv/bin/activate
-pytest tests/ -v
-```
+---
 
-All tests should pass. The test suite includes:
-
-- YAML parsing tests
-- Search functionality tests
-- API endpoint tests
-
-### Docker Container Tests
-
-Docker containers are automatically tested on every PR and push to main:
-
-- Backend container build and health checks
-- Frontend container build and health checks
-- API endpoint functionality
-- Security headers validation
-- Integration test with both containers
-
-See `.github/workflows/docker-test.yml` for details.
-
-### Testing Pull Request Images
-
-For every pull request that modifies backend or frontend code, Docker images are automatically built and published to GitHub Container Registry with PR-specific tags. This makes it easy to test changes before they're merged:
-
-1. **Automatic Build**: When you open a PR, images are built and tagged as `0.0.0-pr.<number>.<short-sha>`
-2. **PR Comment**: A comment is automatically added to the PR with pull commands and testing instructions
-3. **Easy Testing**: Pull and run the images to test the changes in isolation
-
-Example:
-
-```bash
-# Pull PR images (replace with actual PR number)
-docker pull ghcr.io/devsecninja/hadiscover/backend:0.0.0-pr.123.abc1234
-docker pull ghcr.io/devsecninja/hadiscover/frontend:0.0.0-pr.123.abc1234
-
-# Test them
-docker run -d -p 8000:8000 -e ENVIRONMENT=development ghcr.io/devsecninja/hadiscover/backend:0.0.0-pr.123.abc1234
-docker run -d -p 8080:80 ghcr.io/devsecninja/hadiscover/frontend:0.0.0-pr.123.abc1234
-```
-
-See `.github/workflows/pr-images.yml` for details.
-
-## Deployment
-
-hadiscover can be deployed in various ways:
-
-### Docker Deployment (Recommended)
-
-- Using pre-built Docker images from GHCR
-- Semantic versioning
-- Release process
-- Docker image tags
-
-### GitHub Pages (Frontend Only)
-
-The frontend can be deployed to GitHub Pages. See the existing `.github/workflows/deploy.yml` workflow.
-
-## Architecture
-
-For detailed information about the system architecture, data flow, and design decisions, see [ARCHITECTURE.md](./ARCHITECTURE.md).
-
-## Contributing
-
-Contributions are welcome! Whether it's bug fixes, feature enhancements, or documentation improvements, feel free to open an issue or submit a pull request.
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
-
-## Acknowledgments
-
-- Inspired by [kubesearch.dev](https://kubesearch.dev)
-- Built with [FastAPI](https://fastapi.tiangolo.com/), [Next.js](https://nextjs.org/), and [Tailwind CSS](https://tailwindcss.com/)
-- Powered by the [GitHub REST API](https://docs.github.com/en/rest)
-
-## Support
-
-If you find hadiscover useful, consider:
-
-- ⭐ Starring the repository on GitHub
-- 🐛 Reporting bugs or suggesting features via GitHub Issues
-- 📢 Sharing with the Home Assistant community
-
-**Happy Automating! 🏠✨**
+⭐ Star the repo if you find it useful | 🐛 Report bugs via GitHub Issues | 📢 Share with the Home Assistant community
