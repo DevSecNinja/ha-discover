@@ -12,6 +12,8 @@
 
 ## Backend (Python/FastAPI) - Python 3.12+
 
+**Python Environment**: Virtual environment at `backend/venv/` - ALWAYS activate with `source backend/venv/bin/activate` before running Python commands.
+
 **Setup** (first time):
 
 ```bash
@@ -19,15 +21,17 @@ cd backend && python3 -m venv venv && source venv/bin/activate
 pip install --upgrade pip && pip install -r requirements.txt
 ```
 
-**Test** (ALWAYS before changes): `pytest tests/ -v` - All 40 tests must pass (~2s runtime)
+**Quick Start/Stop**: Use `./start.sh` (starts both backend and frontend) or `./stop.sh` (stops both) from project root.
 
-**Dev server**: `python -m uvicorn app.main:app --reload` at <http://localhost:8000>, docs at /docs
+**Test** (ALWAYS before changes): `cd backend && source venv/bin/activate && pytest tests/ -v` - All 58 tests must pass (~13s runtime)
 
-**CLI**: `python -m app.cli index-now` triggers indexing
+**Dev server**: `cd backend && source venv/bin/activate && python -m uvicorn app.main:app --reload` at <http://localhost:8000>, docs at /docs
+
+**CLI**: `cd backend && source venv/bin/activate && python -m app.cli index-now` triggers indexing
 
 **Environment** (optional): `GITHUB_TOKEN` for rate limits, `ENVIRONMENT=development` enables `/api/v1/index` endpoint
 
-**Code Style**: Black formatter (line length 88), isort for imports (Black profile). Run `black .` and `isort .` before committing.
+**Code Style**: Black formatter (line length 88), isort for imports (Black profile). After code changes: `pre-commit run --all-files` (runs Black, isort, and other checks).
 
 ## Frontend (Next.js/TypeScript) - Node.js 18+
 
@@ -92,20 +96,23 @@ Root: README.md, ARCHITECTURE.md, DEPLOYMENT.md, docker-compose.yml
 3. **Docker health check fails**: Wait 5-10s after `docker run`. Check logs with `docker logs <container>`.
 4. **Backend returns 404**: Don't set `ROOT_PATH` for local dev; only for cloud deployments.
 5. **"index-now not found"**: Check Dockerfile installs to /usr/local/bin/.
+6. **Python commands not working**: Make sure to activate venv first: `cd backend && source venv/bin/activate`
 
 ## Key Implementation Notes
 
 - **CORS**: Backend allows localhost:8080, hadiscover.com. Update `app/main.py` if forking.
 - **Rate limit**: /api/v1/index limited to once per 10min (in-memory).
 - **Indexing**: Runs in background thread; returns immediately.
-- **Parsing**: Best-effort YAML parser; gracefully handles errors.
+- **Parsing**: Best-effort YAML parser; gracefully handles errors. Supports both old (`trigger`/`action`/`platform`) and new (`triggers`/`actions`/`trigger`) Home Assistant YAML formats. Automatically deduplicates trigger types.
 - **Export**: Frontend uses Next.js static export with unoptimized images.
 - **Dual mode**: Backend container runs web server (default) or `index-now` CLI (exits after completion).
 
 ## Pre-Commit Validation
 
-**Backend**: Run `pytest tests/ -v` (all 40 pass), format with `black .` and `isort .`, verify imports at top (PEP 8)
-**Frontend**: Run `npm run build` (completes successfully), check TypeScript compiles, verify rendering
+**ALWAYS run after code changes**: `pre-commit run --all-files` from project root
+
+**Backend**: Run `cd backend && source venv/bin/activate && pytest tests/ -v` (all 58 pass), verify Black/isort formatting
+**Frontend**: Run `cd frontend && npm run build` (completes successfully), check TypeScript compiles, verify rendering
 **Before merge**: All GitHub workflows pass (especially docker-test.yml), no new security issues, docs updated if needed
 
 ## Code Conventions

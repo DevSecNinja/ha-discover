@@ -282,3 +282,105 @@ def test_parse_automation_line_numbers_with_blank_lines():
     assert automations[1]["alias"] == "Second Automation"
     assert automations[1]["start_line"] == 8
     assert automations[1]["end_line"] in [12, 13]  # Either is acceptable
+
+
+def test_parse_automation_with_triggers_plural():
+    """Test parsing automation using 'triggers' (plural) instead of 'trigger'."""
+    yaml_with_triggers = """
+alias: "Automation with triggers (plural)"
+description: "Uses triggers: instead of trigger:"
+triggers:
+  - trigger: state
+    entity_id: binary_sensor.front_door_opening
+    to: 'on'
+  - trigger: time
+    at: "12:00:00"
+actions:
+  - action: notify.notify
+    data:
+      message: "Test"
+"""
+    parser = AutomationParser()
+    automations = parser.parse_automation_file(yaml_with_triggers)
+
+    assert len(automations) == 1
+    assert automations[0]["alias"] == "Automation with triggers (plural)"
+    assert len(automations[0]["trigger_types"]) == 2
+    assert "state" in automations[0]["trigger_types"]
+    assert "time" in automations[0]["trigger_types"]
+
+
+def test_parse_automation_with_triggers_containing_trigger_key():
+    """Test parsing automation where triggers list items have 'trigger' key."""
+    yaml_complex = """
+alias: "Complex trigger format"
+triggers:
+  - entity_id:
+    - binary_sensor.front_door_opening
+    to: 'on'
+    trigger: state
+    id: door-opened
+conditions: []
+actions:
+  - action: notify.notify
+"""
+    parser = AutomationParser()
+    automations = parser.parse_automation_file(yaml_complex)
+
+    assert len(automations) == 1
+    assert automations[0]["alias"] == "Complex trigger format"
+    assert "state" in automations[0]["trigger_types"]
+
+
+def test_parse_automation_with_actions_using_action_key():
+    """Test parsing automation where action items use 'action' key instead of 'service'."""
+    yaml_with_action_key = """
+alias: "Newer action format"
+description: "Uses 'action' key instead of 'service' within action items"
+trigger:
+  - platform: state
+    entity_id: sensor.test
+actions:
+  - action: light.turn_on
+    target:
+      entity_id: light.living_room
+  - action: notify.mobile_app
+    data:
+      message: "Test notification"
+  - action: media_player.media_pause
+"""
+    parser = AutomationParser()
+    automations = parser.parse_automation_file(yaml_with_action_key)
+
+    assert len(automations) == 1
+    assert automations[0]["alias"] == "Newer action format"
+    assert len(automations[0]["action_calls"]) == 3
+    assert "light.turn_on" in automations[0]["action_calls"]
+    assert "notify.mobile_app" in automations[0]["action_calls"]
+    assert "media_player.media_pause" in automations[0]["action_calls"]
+
+
+def test_parse_automation_with_actions_plural():
+    """Test parsing automation using 'actions' (plural) instead of 'action'."""
+    yaml_with_actions = """
+alias: "Automation with actions (plural)"
+description: "Uses actions: instead of action:"
+trigger:
+  - platform: state
+    entity_id: sensor.test
+actions:
+  - action: light.turn_on
+    target:
+      entity_id: light.living_room
+  - action: notify.mobile_app
+    data:
+      message: "Test message"
+"""
+    parser = AutomationParser()
+    automations = parser.parse_automation_file(yaml_with_actions)
+
+    assert len(automations) == 1
+    assert automations[0]["alias"] == "Automation with actions (plural)"
+    assert len(automations[0]["action_calls"]) == 2
+    assert "light.turn_on" in automations[0]["action_calls"]
+    assert "notify.mobile_app" in automations[0]["action_calls"]

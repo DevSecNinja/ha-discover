@@ -154,17 +154,17 @@ class AutomationParser:
             description = automation.get("description", "")
 
             # Extract trigger types (best effort)
-            trigger_types = AutomationParser._extract_trigger_types(
-                automation.get("trigger", [])
-            )
+            # Home Assistant supports both 'trigger' and 'triggers' keys
+            triggers = automation.get("triggers") or automation.get("trigger", [])
+            trigger_types = AutomationParser._extract_trigger_types(triggers)
 
             # Extract blueprint information
             blueprint_info = AutomationParser._extract_blueprint_info(automation)
 
             # Extract action calls (services used)
-            action_calls = AutomationParser._extract_action_calls(
-                automation.get("action", [])
-            )
+            # Home Assistant supports both 'action' and 'actions' keys
+            actions = automation.get("actions") or automation.get("action", [])
+            action_calls = AutomationParser._extract_action_calls(actions)
 
             return {
                 "alias": alias,
@@ -191,7 +191,7 @@ class AutomationParser:
         Extract trigger types from automation triggers.
 
         Triggers can be a single dict or a list of dicts.
-        Each trigger typically has a 'platform' key.
+        Each trigger typically has a 'platform' key (older format) or 'trigger' key (newer format).
 
         Args:
             triggers: Trigger configuration (dict or list)
@@ -208,12 +208,13 @@ class AutomationParser:
             elif not isinstance(triggers, list):
                 return trigger_types
 
-            # Extract platform from each trigger
+            # Extract platform/trigger from each trigger
             for trigger in triggers:
                 if isinstance(trigger, dict):
-                    platform = trigger.get("platform")
-                    if platform and platform not in trigger_types:
-                        trigger_types.append(platform)
+                    # Try 'trigger' key first (newer format), then 'platform' (older format)
+                    trigger_type = trigger.get("trigger") or trigger.get("platform")
+                    if trigger_type and trigger_type not in trigger_types:
+                        trigger_types.append(trigger_type)
 
         except Exception as e:
             logger.warning(f"Error extracting trigger types: {e}")
@@ -251,7 +252,7 @@ class AutomationParser:
         Extract service calls from automation actions.
 
         Actions can be a single dict or a list of dicts.
-        Each action may have a 'service' key.
+        Each action may have a 'service' key (older format) or 'action' key (newer format).
 
         Args:
             actions: Action configuration (dict or list)
@@ -273,8 +274,8 @@ class AutomationParser:
                 if not isinstance(action, dict):
                     return
 
-                # Direct service call
-                service = action.get("service")
+                # Direct service call - try 'action' key first (newer format), then 'service' (older format)
+                service = action.get("action") or action.get("service")
                 if service:
                     action_calls_set.add(service)
 
