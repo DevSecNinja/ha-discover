@@ -51,4 +51,4 @@ jobs:
           # comma-separated list of test IDs to skip
           # skips: # optional, default is DEFAULT
           # path to a .bandit file that supplies command line arguments
-          ini_path: bandit.yml # Use .bandit file for configuration
+          config_path: bandit.yml # Use .bandit file for configuration
