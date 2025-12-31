@@ -175,6 +175,27 @@ Docker containers are automatically tested on every PR and push to main:
 
 See `.github/workflows/docker-test.yml` for details.
 
+### Testing Pull Request Images
+
+For every pull request that modifies backend or frontend code, Docker images are automatically built and published to GitHub Container Registry with PR-specific tags. This makes it easy to test changes before they're merged:
+
+1. **Automatic Build**: When you open a PR, images are built and tagged as `0.0.0-pr.<number>.<short-sha>`
+2. **PR Comment**: A comment is automatically added to the PR with pull commands and testing instructions
+3. **Easy Testing**: Pull and run the images to test the changes in isolation
+
+Example:
+```bash
+# Pull PR images (replace with actual PR number)
+docker pull ghcr.io/devsecninja/hadiscover/backend:0.0.0-pr.123.abc1234
+docker pull ghcr.io/devsecninja/hadiscover/frontend:0.0.0-pr.123.abc1234
+
+# Test them
+docker run -d -p 8000:8000 -e ENVIRONMENT=development ghcr.io/devsecninja/hadiscover/backend:0.0.0-pr.123.abc1234
+docker run -d -p 8080:80 ghcr.io/devsecninja/hadiscover/frontend:0.0.0-pr.123.abc1234
+```
+
+See `.github/workflows/pr-images.yml` for details.
+
 ## Deployment
 
 hadiscover can be deployed in various ways:

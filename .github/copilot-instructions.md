@@ -53,6 +53,8 @@ pip install --upgrade pip && pip install -r requirements.txt
 
 **docker-test.yml** (PRIMARY): Builds containers, tests backend API (health, search, stats, docs, index-now CLI), frontend web server, integration tests. Must pass before merge.
 
+**pr-images.yml**: On PRs to main (when backend/frontend changes), builds/pushes Docker images to GHCR with PR-specific tags (`0.0.0-pr.<number>.<short-sha>`), comments on PR with pull commands. Enables testing changes before merge.
+
 **deploy.yml**: Runs 40 backend pytest tests (Python 3.14), builds frontend static export (Node 24). Deployment commented out.
 
 **release.yml**: On version tags (v*.*.*), runs tests, builds/pushes Docker images to GHCR, creates GitHub release.
