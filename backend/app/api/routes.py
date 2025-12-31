@@ -251,5 +251,3 @@ async def health_check():
         Simple health status
     """
     return {"status": "healthy"}
-
-
