@@ -3,7 +3,6 @@
 
 import os
 import sys
-from app.cli import main
 
 # Determine the app directory
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -17,6 +16,9 @@ else:
 # Change to the app directory and add it to Python path
 os.chdir(app_dir)
 sys.path.insert(0, app_dir)
+
+# Import after setting up the path
+from app.cli import main  # noqa: E402
 
 if __name__ == "__main__":
     # Set argv to simulate running "python -m app.cli index-now"
