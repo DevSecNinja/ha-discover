@@ -786,7 +786,7 @@ export default function Home() {
                       >
                         📦 Repositories
                       </h3>
-                      <div className="space-y-2 max-h-64 overflow-y-auto">
+                      <div className="space-y-2 max-h-64 overflow-y-auto pb-1">
                         {facets.repositories.map((repo) => {
                           const repoKey = `${repo.owner}/${repo.name}`;
                           const isSelected = selectedRepo === repoKey;
@@ -797,7 +797,7 @@ export default function Home() {
                               onClick={() =>
                                 setSelectedRepo(isSelected ? null : repoKey)
                               }
-                              className="w-full text-left px-3 py-2 rounded-lg transition-all duration-150 hover:scale-[1.02]"
+                              className="w-full text-left px-3 py-2 rounded-lg transition-all duration-150"
                               style={{
                                 background: isSelected
                                   ? isDark
@@ -813,6 +813,31 @@ export default function Home() {
                                   : isDark
                                     ? "1px solid rgba(255, 255, 255, 0.05)"
                                     : "1px solid rgba(0, 0, 0, 0.05)",
+                              }}
+                              onMouseEnter={(e) => {
+                                if (isDark) {
+                                  e.currentTarget.style.background = isSelected
+                                    ? "rgba(167, 139, 250, 0.3)"
+                                    : "rgba(255, 255, 255, 0.1)";
+                                  e.currentTarget.style.boxShadow =
+                                    "0 4px 12px rgba(0, 0, 0, 0.2)";
+                                } else {
+                                  e.currentTarget.style.background = isSelected
+                                    ? "rgba(124, 58, 237, 0.2)"
+                                    : "rgba(0, 0, 0, 0.05)";
+                                  e.currentTarget.style.boxShadow =
+                                    "0 2px 8px rgba(0, 0, 0, 0.08)";
+                                }
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.background = isSelected
+                                  ? isDark
+                                    ? "rgba(167, 139, 250, 0.2)"
+                                    : "rgba(124, 58, 237, 0.15)"
+                                  : isDark
+                                    ? "rgba(255, 255, 255, 0.05)"
+                                    : "rgba(0, 0, 0, 0.03)";
+                                e.currentTarget.style.boxShadow = "none";
                               }}
                             >
                               <div className="flex items-center justify-between">
@@ -880,7 +905,7 @@ export default function Home() {
                       >
                         🎨 Blueprints
                       </h3>
-                      <div className="space-y-2 max-h-64 overflow-y-auto">
+                      <div className="space-y-2 max-h-64 overflow-y-auto pb-1">
                         {facets.blueprints.map((blueprint) => {
                           const isSelected =
                             selectedBlueprint === blueprint.path;
@@ -895,7 +920,7 @@ export default function Home() {
                                   isSelected ? null : blueprint.path,
                                 )
                               }
-                              className="w-full text-left px-3 py-2 rounded-lg transition-all duration-150 hover:scale-[1.02]"
+                              className="w-full text-left px-3 py-2 rounded-lg transition-all duration-150"
                               style={{
                                 background: isSelected
                                   ? isDark
@@ -911,6 +936,31 @@ export default function Home() {
                                   : isDark
                                     ? "1px solid rgba(255, 255, 255, 0.05)"
                                     : "1px solid rgba(0, 0, 0, 0.05)",
+                              }}
+                              onMouseEnter={(e) => {
+                                if (isDark) {
+                                  e.currentTarget.style.background = isSelected
+                                    ? "rgba(96, 165, 250, 0.3)"
+                                    : "rgba(255, 255, 255, 0.1)";
+                                  e.currentTarget.style.boxShadow =
+                                    "0 4px 12px rgba(0, 0, 0, 0.2)";
+                                } else {
+                                  e.currentTarget.style.background = isSelected
+                                    ? "rgba(37, 99, 235, 0.2)"
+                                    : "rgba(0, 0, 0, 0.05)";
+                                  e.currentTarget.style.boxShadow =
+                                    "0 2px 8px rgba(0, 0, 0, 0.08)";
+                                }
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.background = isSelected
+                                  ? isDark
+                                    ? "rgba(96, 165, 250, 0.2)"
+                                    : "rgba(37, 99, 235, 0.15)"
+                                  : isDark
+                                    ? "rgba(255, 255, 255, 0.05)"
+                                    : "rgba(0, 0, 0, 0.03)";
+                                e.currentTarget.style.boxShadow = "none";
                               }}
                             >
                               <div className="flex items-center justify-between">
@@ -969,7 +1019,7 @@ export default function Home() {
                       >
                         ⚡ Triggers
                       </h3>
-                      <div className="space-y-2 max-h-64 overflow-y-auto">
+                      <div className="space-y-2 max-h-64 overflow-y-auto pb-1">
                         {facets.triggers.map((trigger) => {
                           const isSelected = selectedTrigger === trigger.type;
                           return (
@@ -981,7 +1031,7 @@ export default function Home() {
                                   isSelected ? null : trigger.type,
                                 )
                               }
-                              className="w-full text-left px-3 py-2 rounded-lg transition-all duration-150 hover:scale-[1.02]"
+                              className="w-full text-left px-3 py-2 rounded-lg transition-all duration-150"
                               style={{
                                 background: isSelected
                                   ? isDark
@@ -997,6 +1047,31 @@ export default function Home() {
                                   : isDark
                                     ? "1px solid rgba(255, 255, 255, 0.05)"
                                     : "1px solid rgba(0, 0, 0, 0.05)",
+                              }}
+                              onMouseEnter={(e) => {
+                                if (isDark) {
+                                  e.currentTarget.style.background = isSelected
+                                    ? "rgba(52, 211, 153, 0.3)"
+                                    : "rgba(255, 255, 255, 0.1)";
+                                  e.currentTarget.style.boxShadow =
+                                    "0 4px 12px rgba(0, 0, 0, 0.2)";
+                                } else {
+                                  e.currentTarget.style.background = isSelected
+                                    ? "rgba(16, 185, 129, 0.2)"
+                                    : "rgba(0, 0, 0, 0.05)";
+                                  e.currentTarget.style.boxShadow =
+                                    "0 2px 8px rgba(0, 0, 0, 0.08)";
+                                }
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.background = isSelected
+                                  ? isDark
+                                    ? "rgba(52, 211, 153, 0.2)"
+                                    : "rgba(16, 185, 129, 0.15)"
+                                  : isDark
+                                    ? "rgba(255, 255, 255, 0.05)"
+                                    : "rgba(0, 0, 0, 0.03)";
+                                e.currentTarget.style.boxShadow = "none";
                               }}
                             >
                               <div className="flex items-center justify-between">
