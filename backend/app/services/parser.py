@@ -106,7 +106,9 @@ class AutomationParser:
                         # end_mark.line points to the line after the last line (0-indexed)
                         # So end_mark.line is already one past the end in 0-indexed terms
                         start_line = node.start_mark.line + 1
-                        end_line = node.end_mark.line  # Already points one past, so this gives us the correct last line
+                        end_line = (
+                            node.end_mark.line
+                        )  # Already points one past, so this gives us the correct last line
 
                 parsed = AutomationParser._parse_single_automation(
                     auto, start_line, end_line
