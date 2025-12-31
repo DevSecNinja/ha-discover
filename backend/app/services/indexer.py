@@ -104,13 +104,13 @@ class IndexingService:
 
             if metadata:
                 # Update existing record
-                metadata.value = current_time.isoformat()
+                metadata.value = current_time.isoformat() + "Z"
                 metadata.updated_at = current_time
             else:
                 # Create new record
                 metadata = IndexingMetadata(
                     key="last_completed_at",
-                    value=current_time.isoformat(),
+                    value=current_time.isoformat() + "Z",
                     updated_at=current_time,
                 )
                 db.add(metadata)

@@ -143,7 +143,7 @@ def test_statistics_includes_last_indexed_timestamp(test_db):
     # Create a metadata entry
     from datetime import datetime
 
-    timestamp = datetime.utcnow().isoformat()
+    timestamp = datetime.utcnow().isoformat() + "Z"
     metadata = IndexingMetadata(
         key="last_completed_at", value=timestamp, updated_at=datetime.utcnow()
     )
