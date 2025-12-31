@@ -51,4 +51,4 @@ jobs:
           # comma-separated list of test IDs to skip
           # skips: # optional, default is DEFAULT
           # path to a .bandit file that supplies command line arguments
-          ini_path: pyproject.toml # Use pyproject.toml for Bandit configuration
+          ini_path: .bandit # Use .bandit file for configuration
