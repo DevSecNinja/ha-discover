@@ -62,64 +62,12 @@ jobs:
     needs: [determine-version, build-and-push-backend, build-and-push-frontend]
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
       - name: Comment PR with image tags
         uses: actions/github-script@v7
         with:
           script: |
-            const version = '${{ needs.determine-version.outputs.version }}';
-            const registry = 'ghcr.io';
-            const repo = context.repo.owner.toLowerCase() + '/' + context.repo.repo.toLowerCase();
-
-            const backendImage = `${registry}/${repo}/backend:${version}`;
-            const frontendImage = `${registry}/${repo}/frontend:${version}`;
-
-            const comment = `## 🐳 Docker Images Published
-
-            The following Docker images have been built and published for this PR:
-
-            ### Backend
-            \`\`\`bash
-            docker pull ${backendImage}
-            \`\`\`
-
-            ### Frontend
-            \`\`\`bash
-            docker pull ${frontendImage}
-            \`\`\`
-
-            ### Test the PR build
-            \`\`\`bash
-            # Test backend
-            docker run -d -p 8000:8000 -e ENVIRONMENT=development ${backendImage}
-            curl http://localhost:8000/api/v1/health
-
-            # Test frontend
-            docker run -d -p 8080:80 ${frontendImage}
-            curl http://localhost:8080/hadiscover/
-            \`\`\`
-
-            ### Using docker-compose
-            \`\`\`yaml
-            services:
-              backend:
-                image: ${backendImage}
-                ports:
-                  - "8000:8000"
-                environment:
-                  - ENVIRONMENT=development
-
-              frontend:
-                image: ${frontendImage}
-                ports:
-                  - "8080:80"
-            \`\`\`
-
-            ---
-            *Images are tagged with \`${version}\` and will be retained for testing purposes.*`;
-
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: comment
-            });
+            const script = require('./.github/scripts/comment-pr-images.js');
+            await script({ github, context, version: '${{ needs.determine-version.outputs.version }}' });
