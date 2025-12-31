@@ -215,6 +215,7 @@ export default function Home() {
         day: "numeric",
         hour: "2-digit",
         minute: "2-digit",
+        hour12: false,
         timeZoneName: "short",
       });
     } catch (error) {
@@ -1698,21 +1699,6 @@ Here's my automation YAML:
             </details>
           </div>
 
-          {statistics?.last_indexed_at && (
-            <div className="text-center mt-6">
-              <p
-                className="text-sm"
-                style={{
-                  color: isDark
-                    ? "rgba(255, 255, 255, 0.3)"
-                    : "rgba(0, 0, 0, 0.4)",
-                }}
-              >
-                Last indexed: {formatLastIndexed(statistics.last_indexed_at)}
-              </p>
-            </div>
-          )}
-
           {/* Repository Info */}
           {statistics && (
             <div className="text-center mt-6">
@@ -1756,9 +1742,7 @@ Here's my automation YAML:
                     clipRule="evenodd"
                   />
                 </svg>
-                <span className="font-medium">
-                  DevSecNinja/hadiscover
-                </span>
+                <span className="font-medium">DevSecNinja/hadiscover</span>
                 <span className="flex items-center gap-1">
                   <svg
                     className="w-4 h-4"
@@ -1787,13 +1771,28 @@ Here's my automation YAML:
           )}
 
           <div
-            className="text-center mt-8 text-sm"
+            className="text-center mt-6 text-sm"
             style={{
               color: isDark ? "rgba(255, 255, 255, 0.3)" : "rgba(0, 0, 0, 0.4)",
             }}
           >
             <p>Built with 💙 for the Home Assistant community</p>
           </div>
+
+          {statistics?.last_indexed_at && (
+            <div className="text-center mt-6">
+              <p
+                className="text-sm"
+                style={{
+                  color: isDark
+                    ? "rgba(255, 255, 255, 0.3)"
+                    : "rgba(0, 0, 0, 0.4)",
+                }}
+              >
+                Last indexed: {formatLastIndexed(statistics.last_indexed_at)}
+              </p>
+            </div>
+          )}
         </footer>
       </div>
     </div>
