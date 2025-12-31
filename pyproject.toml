@@ -3,6 +3,3 @@ target-version = ["py311"]
 
 [tool.isort]
 profile = "black"
-
-[tool.bandit]
-exclude_dirs = ["tests/*.py", "backend/tests/*.py", "frontend/tests/*.py"]
