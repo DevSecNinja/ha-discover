@@ -667,10 +667,7 @@ export default function Home() {
                       className="w-5 h-5"
                       style={{
                         color: isDark ? "#a78bfa" : "#7c3aed",
-                        transform:
-                          showFilters && !isMobile
-                            ? "rotate(0deg)"
-                            : "rotate(180deg)",
+                        transform: showFilters ? "rotate(0deg)" : "rotate(180deg)",
                         transition: "transform 0.3s",
                       }}
                       fill="none"
