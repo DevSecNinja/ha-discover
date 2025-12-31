@@ -7,10 +7,10 @@
 # This action will run Bandit on your codebase.
 # The results of the scan will be found under the Security tab of your repository.
 
-# https://github.com/marketplace/actions/bandit-scan is ISC licensed, by abirismyname
+# https://github.com/marketplace/actions/bandit-scanner is ISC licensed, by abirismyname
 # https://pypi.org/project/bandit/ is Apache v2.0 licensed, by PyCQA
 
-name: Bandit Security Scan
+name: Bandit Security Scanner
 on:
   push:
     branches: [ "main" ]
@@ -33,8 +33,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - name: Bandit Scan
-        uses: shundor/python-bandit-scan@ab1d87dfccc5a0ffab88be3aaac6ffe35c10d6cd
+      - name: Bandit Scanner
+        uses: DevSecNinja/python-bandit-scan@v1.0.1
         with: # optional arguments
           # exit with 0, even with results found
           exit_zero: true # optional, default is DEFAULT
@@ -51,4 +51,4 @@ jobs:
           # comma-separated list of test IDs to skip
           # skips: # optional, default is DEFAULT
           # path to a .bandit file that supplies command line arguments
-          # ini_path: # optional, default is DEFAULT
+          config_path: bandit.yml # Use .bandit file for configuration
