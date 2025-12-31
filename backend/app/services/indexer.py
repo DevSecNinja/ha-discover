@@ -4,6 +4,7 @@ import logging
 from datetime import datetime
 from typing import List
 
+import httpx
 from app.models.database import Automation, IndexingMetadata, Repository
 from app.services.github_service import GitHubRateLimitError, GitHubService
 from app.services.parser import AutomationParser
@@ -133,8 +134,6 @@ class IndexingService:
             db: Database session
         """
         try:
-            import httpx
-
             async with httpx.AsyncClient() as client:
                 url = f"{self.github_service.BASE_URL}/repos/DevSecNinja/hadiscover"
                 response = await client.get(
