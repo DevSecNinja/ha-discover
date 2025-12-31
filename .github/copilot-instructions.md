@@ -8,7 +8,7 @@
 - **Stack**: Python 3.12+ (FastAPI), Next.js 14 (TypeScript), SQLite database
 - **Architecture**: RESTful API backend, static-export frontend, Docker-based deployment
 - **Key Features**: Full-text search, GitHub API integration, automated indexing, opt-in via topics
-- **Documentation**: See README.md (user guide), ARCHITECTURE.md (technical details), DEPLOYMENT.md (hosting)
+- **Documentation**: See README.md (user guide), ARCHITECTURE.md (technical details)
 
 ## Backend (Python/FastAPI) - Python 3.12+
 
@@ -76,7 +76,7 @@ backend/: requirements.txt, pytest.ini, Dockerfile, entrypoint.sh, .env.example
 frontend/app/: page.tsx (search UI), layout.tsx, globals.css
 frontend/: package.json, next.config.ts (static export, basePath:'/hadiscover'), Dockerfile
 .github/workflows/: docker-test.yml (primary), deploy.yml, release.yml
-Root: README.md, ARCHITECTURE.md, DEPLOYMENT.md, docker-compose.yml
+Root: README.md, ARCHITECTURE.md, docker-compose.yml
 ```
 
 **Database**: SQLite at `backend/data/hadiscover.db` (auto-created). Tables: repositories, automations.

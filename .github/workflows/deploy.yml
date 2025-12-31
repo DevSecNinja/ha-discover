@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 # This workflow deploys the frontend to GitHub Pages
 # IMPORTANT: Before running this workflow, you must:
-# 1. Deploy the backend API (see BACKEND_DEPLOYMENT.md)
+# 1. Deploy the backend API
 # 2. Configure the API_URL secret in GitHub repository settings
 #    OR update NEXT_PUBLIC_API_URL in the build step below
 
