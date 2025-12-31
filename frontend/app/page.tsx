@@ -33,6 +33,7 @@ interface SearchResponse {
 interface Statistics {
   total_repositories: number;
   total_automations: number;
+  last_indexed_at: string | null;
 }
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -140,6 +141,25 @@ export default function Home() {
     const newTheme = !isDark;
     setIsDark(newTheme);
     localStorage.setItem("theme", newTheme ? "dark" : "light");
+  };
+
+  const formatLastIndexed = (isoString: string | null) => {
+    if (!isoString) return null;
+
+    try {
+      const date = new Date(isoString);
+      // Format in user's local timezone
+      return date.toLocaleString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        timeZoneName: "short",
+      });
+    } catch (e) {
+      return null;
+    }
   };
 
   return (
@@ -1094,6 +1114,21 @@ Here's my automation YAML:
               </div>
             </details>
           </div>
+
+          {statistics?.last_indexed_at && (
+            <div className="text-center mt-6">
+              <p
+                className="text-sm"
+                style={{
+                  color: isDark
+                    ? "rgba(255, 255, 255, 0.3)"
+                    : "rgba(0, 0, 0, 0.4)",
+                }}
+              >
+                Last indexed: {formatLastIndexed(statistics.last_indexed_at)}
+              </p>
+            </div>
+          )}
 
           <div
             className="text-center mt-8 text-sm"
