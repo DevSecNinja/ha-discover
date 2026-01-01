@@ -511,7 +511,7 @@ export default function Home() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search automations, triggers, actions..."
-                className="w-full pl-12 pr-6 py-5 text-lg rounded-2xl border focus:outline-none focus:ring-1 focus:border-transparent transition-all duration-200"
+                className="w-full pl-12 pr-12 py-5 text-lg rounded-2xl border focus:outline-none focus:ring-1 focus:border-transparent transition-all duration-200"
                 style={{
                   color: isDark ? "#e0e7ff" : "#1f2937",
                   background: isDark
@@ -540,6 +540,38 @@ export default function Home() {
                     : "0 2px 8px rgba(0, 0, 0, 0.05)";
                 }}
               />
+              {query && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setQuery("");
+                    performSearch("");
+                  }}
+                  className="absolute inset-y-0 right-4 flex items-center hover:opacity-70 transition-opacity duration-200"
+                  aria-label="Clear search"
+                  title="Clear search"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    style={{
+                      color: isDark
+                        ? "rgba(255, 255, 255, 0.5)"
+                        : "rgba(0, 0, 0, 0.5)",
+                    }}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              )}
             </div>
             <button
               type="submit"
