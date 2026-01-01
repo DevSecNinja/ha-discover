@@ -1,0 +1,86 @@
+---
+name: Auto Label Issues
+
+on: # yamllint disable-line rule:truthy
+  issues:
+    types: [opened, edited]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  label:
+    name: Label Issue
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Label issues based on keywords
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const title = issue.title.toLowerCase();
+            const body = (issue.body || '').toLowerCase();
+            const text = title + ' ' + body;
+            
+            const labels = [];
+            
+            // Frontend related keywords
+            if (text.match(/frontend|ui|interface|next\.?js|react|typescript|tsx|css|tailwind/)) {
+              labels.push('frontend');
+            }
+            
+            // Backend related keywords
+            if (text.match(/backend|api|fastapi|python|database|sqlite|endpoint|service/)) {
+              labels.push('backend');
+            }
+            
+            // Docker related keywords
+            if (text.match(/docker|container|image|dockerfile|docker-compose/)) {
+              labels.push('docker');
+            }
+            
+            // CI/CD related keywords
+            if (text.match(/ci\/cd|workflow|github actions|deployment|pipeline/)) {
+              labels.push('ci/cd');
+            }
+            
+            // Documentation related keywords
+            if (text.match(/documentation|readme|docs|guide|tutorial/)) {
+              labels.push('documentation');
+            }
+            
+            // Bug related keywords
+            if (text.match(/bug|error|crash|fail|broken|issue|problem|not working/)) {
+              labels.push('bug');
+            }
+            
+            // Enhancement related keywords
+            if (text.match(/feature|enhancement|improvement|add|new|request|suggestion/)) {
+              labels.push('enhancement');
+            }
+            
+            // Security related keywords
+            if (text.match(/security|vulnerability|cve|exploit|unsafe/)) {
+              labels.push('security');
+            }
+            
+            // Performance related keywords
+            if (text.match(/performance|slow|optimize|speed|latency|memory/)) {
+              labels.push('performance');
+            }
+            
+            // Dependencies related keywords
+            if (text.match(/dependency|dependencies|package|npm|pip|upgrade|update.*version/)) {
+              labels.push('dependencies');
+            }
+            
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: labels
+              });
+            }
