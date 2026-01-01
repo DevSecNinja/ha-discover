@@ -282,7 +282,7 @@ export default function Home() {
     },
   };
 
-  const organizationJsonLd = {
+  const softwareApplicationJsonLd = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     name: "hadiscover",
