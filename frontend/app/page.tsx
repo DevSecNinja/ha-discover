@@ -305,15 +305,8 @@ export default function Home() {
 
   return (
     <>
-      {/* JSON-LD Structured Data */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
-      />
+      {/* JSON-LD structured data is now intended to be rendered from a server component
+          (e.g., layout.tsx) to ensure it is included in the initial HTML response. */}
       <div
         className="min-h-screen relative overflow-hidden"
         style={{
