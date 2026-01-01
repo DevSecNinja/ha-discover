@@ -50,6 +50,9 @@ interface SearchResponse {
   query: string;
   results: Automation[];
   count: number;
+  total: number;
+  page: number;
+  per_page: number;
   facets: Facets;
 }
 
@@ -103,6 +106,9 @@ export default function Home() {
   const [selectedTrigger, setSelectedTrigger] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalResults, setTotalResults] = useState(0);
+  const [perPage] = useState(30); // Fixed at 30 per requirement
 
   useEffect(() => {
     // Load theme preference from localStorage
@@ -162,11 +168,13 @@ export default function Home() {
     }
   };
 
-  const performSearch = async (searchQuery: string) => {
+  const performSearch = async (searchQuery: string, page: number = 1) => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
       params.append("q", searchQuery);
+      params.append("page", page.toString());
+      params.append("per_page", perPage.toString());
       if (selectedRepo) params.append("repo", selectedRepo);
       if (selectedBlueprint) params.append("blueprint", selectedBlueprint);
       if (selectedTrigger) params.append("trigger", selectedTrigger);
@@ -177,9 +185,12 @@ export default function Home() {
       const data: SearchResponse = await response.json();
       setResults(data.results);
       setFacets(data.facets);
+      setTotalResults(data.total);
+      setCurrentPage(page);
     } catch (error) {
       console.error("Error searching:", error);
       setResults([]);
+      setTotalResults(0);
     } finally {
       setLoading(false);
     }
@@ -196,12 +207,14 @@ export default function Home() {
   // Re-run search when filters change
   // biome-ignore lint/correctness/useExhaustiveDependencies: Filter changes should trigger search
   useEffect(() => {
-    performSearch(query);
+    setCurrentPage(1); // Reset to page 1 when filters change
+    performSearch(query, 1);
   }, [selectedRepo, selectedBlueprint, selectedTrigger]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    performSearch(query);
+    setCurrentPage(1); // Reset to page 1 on new search
+    performSearch(query, 1);
   };
 
   const handleTriggerIndexing = async () => {
@@ -1551,6 +1564,104 @@ export default function Home() {
                   </div>
                 </article>
               ))
+            )}
+            
+            {/* Pagination Controls */}
+            {!loading && results.length > 0 && totalResults > perPage && (
+              <div
+                className="mt-8 flex justify-center items-center gap-4 rounded-2xl backdrop-blur-xl p-6"
+                style={{
+                  background: isDark
+                    ? "rgba(25, 25, 40, 0.6)"
+                    : "rgba(255, 255, 255, 0.8)",
+                  border: isDark
+                    ? "1px solid rgba(255, 255, 255, 0.08)"
+                    : "1px solid rgba(0, 0, 0, 0.08)",
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => {
+                    const newPage = currentPage - 1;
+                    performSearch(query, newPage);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 rounded-xl font-medium transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                  style={{
+                    background: isDark
+                      ? "rgba(255, 255, 255, 0.1)"
+                      : "rgba(0, 0, 0, 0.06)",
+                    color: isDark ? "#e0e7ff" : "#1f2937",
+                    border: isDark
+                      ? "1px solid rgba(255, 255, 255, 0.1)"
+                      : "1px solid rgba(0, 0, 0, 0.1)",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (currentPage > 1) {
+                      e.currentTarget.style.background = isDark
+                        ? "rgba(255, 255, 255, 0.15)"
+                        : "rgba(0, 0, 0, 0.1)";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = isDark
+                      ? "rgba(255, 255, 255, 0.1)"
+                      : "rgba(0, 0, 0, 0.06)";
+                  }}
+                >
+                  ← Previous
+                </button>
+
+                <div
+                  className="flex items-center gap-2"
+                  style={{
+                    color: isDark ? "rgba(255, 255, 255, 0.7)" : "rgba(0, 0, 0, 0.7)",
+                  }}
+                >
+                  <span className="font-medium">
+                    Page {currentPage} of {Math.ceil(totalResults / perPage)}
+                  </span>
+                  <span className="opacity-50">•</span>
+                  <span className="text-sm">
+                    {totalResults} total result{totalResults !== 1 ? "s" : ""}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const newPage = currentPage + 1;
+                    performSearch(query, newPage);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  disabled={currentPage >= Math.ceil(totalResults / perPage)}
+                  className="px-4 py-2 rounded-xl font-medium transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                  style={{
+                    background: isDark
+                      ? "rgba(255, 255, 255, 0.1)"
+                      : "rgba(0, 0, 0, 0.06)",
+                    color: isDark ? "#e0e7ff" : "#1f2937",
+                    border: isDark
+                      ? "1px solid rgba(255, 255, 255, 0.1)"
+                      : "1px solid rgba(0, 0, 0, 0.1)",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (currentPage < Math.ceil(totalResults / perPage)) {
+                      e.currentTarget.style.background = isDark
+                        ? "rgba(255, 255, 255, 0.15)"
+                        : "rgba(0, 0, 0, 0.1)";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = isDark
+                      ? "rgba(255, 255, 255, 0.1)"
+                      : "rgba(0, 0, 0, 0.06)";
+                  }}
+                >
+                  Next →
+                </button>
+              </div>
             )}
           </div>
         </div>
