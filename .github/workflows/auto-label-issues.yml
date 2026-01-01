@@ -1,0 +1,106 @@
+---
+name: Auto Label Issues
+
+on:  # yamllint disable-line rule:truthy
+  issues:
+    types: [opened, edited]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  label:
+    name: Label Issue
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Label issues based on keywords
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const title = issue.title.toLowerCase();
+            const body = (issue.body || '').toLowerCase();
+            const text = title + ' ' + body;
+
+            const labels = [];
+
+            // Frontend related keywords
+            const frontendPattern =
+              /frontend|ui|interface|next\.?js|react|typescript|tsx|css|tailwind/;
+            if (text.match(frontendPattern)) {
+              labels.push('frontend');
+            }
+
+            // Backend related keywords
+            const backendPattern =
+              /backend|api|fastapi|python|database|sqlite|endpoint|service/;
+            if (text.match(backendPattern)) {
+              labels.push('backend');
+            }
+
+            // Docker related keywords
+            const dockerPattern =
+              /docker|container|image|dockerfile|docker-compose/;
+            if (text.match(dockerPattern)) {
+              labels.push('docker');
+            }
+
+            // CI/CD related keywords
+            const cicdPattern =
+              /ci\/cd|workflow|github actions|deployment|pipeline/;
+            if (text.match(cicdPattern)) {
+              labels.push('ci/cd');
+            }
+
+            // Documentation related keywords
+            const docsPattern =
+              /documentation|readme|docs|guide|tutorial/;
+            if (text.match(docsPattern)) {
+              labels.push('documentation');
+            }
+
+            // Bug related keywords
+            const bugPattern =
+              /bug|error|crash|fail|broken|problem|not working/;
+            if (text.match(bugPattern)) {
+              labels.push('bug');
+            }
+
+            // Enhancement related keywords
+            const enhancementPattern =
+              /feature|enhancement|improvement|add|new|request|suggestion/;
+            if (text.match(enhancementPattern)) {
+              labels.push('enhancement');
+            }
+
+            // Security related keywords
+            const securityPattern =
+              /security|vulnerability|cve|exploit|unsafe/;
+            if (text.match(securityPattern)) {
+              labels.push('security');
+            }
+
+            // Performance related keywords
+            const performancePattern =
+              /performance|slow|optimize|speed|latency|memory/;
+            if (text.match(performancePattern)) {
+              labels.push('performance');
+            }
+
+            // Dependencies related keywords
+            const depsPattern =
+              /dependency|dependencies|package|npm|pip|upgrade|update.*version/;
+            if (text.match(depsPattern)) {
+              labels.push('dependencies');
+            }
+
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: labels
+              });
+            }

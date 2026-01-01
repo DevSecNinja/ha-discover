@@ -127,7 +127,7 @@ OpenAPI/Swagger docs available at <http://localhost:8000/docs> once running.
 ## More Information
 
 - **Architecture**: See [ARCHITECTURE.md](./ARCHITECTURE.md) for technical details
-- **Contributing**: PRs welcome! Open an issue for bugs or feature requests
+- **Contributing**: PRs welcome! Open an issue for bugs or feature requests. PRs are automatically labeled based on changed files—see [.github/LABELING.md](./.github/LABELING.md) for details
 - **License**: MIT License
 - **Stack**: FastAPI (Python), Next.js (TypeScript), SQLite
 - **Inspired by**: [kubesearch.dev](https://kubesearch.dev)
