@@ -1614,6 +1614,191 @@ export default function Home() {
             </div>
           </div>
 
+          {/* How to Add Automations Section */}
+          <div className="mt-8">
+            <details
+              className="rounded-3xl backdrop-blur-xl overflow-hidden transition-all duration-200"
+              style={{
+                background: isDark
+                  ? "rgba(25, 25, 40, 0.6)"
+                  : "rgba(255, 255, 255, 0.8)",
+                border: isDark
+                  ? "1px solid rgba(255, 255, 255, 0.08)"
+                  : "1px solid rgba(0, 0, 0, 0.08)",
+              }}
+            >
+              <summary
+                className="px-8 py-6 cursor-pointer list-none transition-all duration-200 hover:bg-opacity-90"
+                style={{
+                  color: isDark ? "#e0e7ff" : "#1f2937",
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">🏠</span>
+                    <div>
+                      <h3 className="text-lg font-semibold">
+                        How to Add Automations to Home Assistant
+                      </h3>
+                      <p
+                        className="text-sm mt-1"
+                        style={{
+                          color: isDark
+                            ? "rgba(255, 255, 255, 0.5)"
+                            : "rgba(0, 0, 0, 0.5)",
+                        }}
+                      >
+                        Copy YAML and add to your instance
+                      </p>
+                    </div>
+                  </div>
+                  <svg
+                    className="w-5 h-5 transition-transform duration-200"
+                    style={{
+                      color: isDark
+                        ? "rgba(255, 255, 255, 0.5)"
+                        : "rgba(0, 0, 0, 0.5)",
+                    }}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    role="img"
+                    aria-label="Expand section"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+              </summary>
+              <div
+                className="px-8 pb-8 pt-4 border-t"
+                style={{
+                  borderColor: isDark
+                    ? "rgba(255, 255, 255, 0.08)"
+                    : "rgba(0, 0, 0, 0.08)",
+                }}
+              >
+                <p
+                  className="mb-4 leading-relaxed"
+                  style={{
+                    color: isDark
+                      ? "rgba(255, 255, 255, 0.6)"
+                      : "rgba(0, 0, 0, 0.7)",
+                  }}
+                >
+                  Found an automation you like? Here's how to add it to your
+                  Home Assistant:
+                </p>
+                <ol
+                  className="list-decimal list-inside space-y-3 mb-6"
+                  style={{
+                    color: isDark
+                      ? "rgba(255, 255, 255, 0.6)"
+                      : "rgba(0, 0, 0, 0.7)",
+                  }}
+                >
+                  <li>
+                    <strong>Copy the YAML</strong> - Click on the GitHub link
+                    for any automation and copy its YAML code
+                  </li>
+                  <li>
+                    <strong>Open Home Assistant</strong> - Go to Settings →
+                    Automations & Scenes → Create Automation
+                  </li>
+                  <li>
+                    <strong>Paste the code</strong> - Click the three-dot menu →
+                    Edit in YAML, then paste your code
+                  </li>
+                  <li>
+                    <strong>Customize</strong> - Update entity names and settings
+                    to match your setup
+                  </li>
+                  <li>
+                    <strong>Save</strong> - Save your automation and test it!
+                  </li>
+                </ol>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <a
+                    href="https://my.home-assistant.io/redirect/automations/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200"
+                    style={{
+                      background: isDark
+                        ? "linear-gradient(135deg, rgba(18, 188, 242, 0.8), rgba(14, 165, 233, 0.8))"
+                        : "linear-gradient(135deg, rgb(18, 188, 242), rgb(14, 165, 233))",
+                      color: "#ffffff",
+                      border: isDark
+                        ? "1px solid rgba(18, 188, 242, 0.3)"
+                        : "none",
+                      boxShadow: isDark
+                        ? "0 4px 12px rgba(18, 188, 242, 0.25)"
+                        : "0 4px 12px rgba(18, 188, 242, 0.3)",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = "translateY(-1px)";
+                      e.currentTarget.style.boxShadow = isDark
+                        ? "0 6px 16px rgba(18, 188, 242, 0.35)"
+                        : "0 6px 16px rgba(18, 188, 242, 0.4)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.boxShadow = isDark
+                        ? "0 4px 12px rgba(18, 188, 242, 0.25)"
+                        : "0 4px 12px rgba(18, 188, 242, 0.3)";
+                    }}
+                  >
+                    <svg
+                      className="w-5 h-5"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                      role="img"
+                      aria-label="Home Assistant logo"
+                    >
+                      <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z" />
+                    </svg>
+                    Open Home Assistant Automations
+                  </a>
+                  <a
+                    href="https://www.home-assistant.io/docs/automation/editor/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-medium transition-all duration-200"
+                    style={{
+                      color: isDark
+                        ? "rgba(255, 255, 255, 0.7)"
+                        : "rgba(0, 0, 0, 0.7)",
+                      background: isDark
+                        ? "rgba(255, 255, 255, 0.05)"
+                        : "rgba(0, 0, 0, 0.04)",
+                      border: isDark
+                        ? "1px solid rgba(255, 255, 255, 0.08)"
+                        : "1px solid rgba(0, 0, 0, 0.08)",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = isDark
+                        ? "rgba(255, 255, 255, 0.08)"
+                        : "rgba(0, 0, 0, 0.06)";
+                      e.currentTarget.style.transform = "translateY(-1px)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = isDark
+                        ? "rgba(255, 255, 255, 0.05)"
+                        : "rgba(0, 0, 0, 0.04)";
+                      e.currentTarget.style.transform = "translateY(0)";
+                    }}
+                  >
+                    📚 View Documentation
+                  </a>
+                </div>
+              </div>
+            </details>
+          </div>
+
           {/* GPT Prompt Section */}
           <div className="mt-8">
             <details
