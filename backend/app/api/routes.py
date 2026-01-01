@@ -43,6 +43,7 @@ class RepositoryFacet(BaseModel):
 
     owner: str
     name: str
+    stars: int
     count: int
 
 

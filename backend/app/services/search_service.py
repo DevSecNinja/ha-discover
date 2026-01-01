@@ -309,9 +309,10 @@ class SearchService:
                 repo_query.with_entities(
                     Repository.owner,
                     Repository.name,
+                    Repository.stars,
                     func.count(Automation.id).label("count"),
                 )
-                .group_by(Repository.owner, Repository.name)
+                .group_by(Repository.owner, Repository.name, Repository.stars)
                 .order_by(func.count(Automation.id).desc())
                 .limit(20)
                 .all()
@@ -375,8 +376,8 @@ class SearchService:
 
             return {
                 "repositories": [
-                    {"owner": owner, "name": name, "count": count}
-                    for owner, name, count in repo_facets
+                    {"owner": owner, "name": name, "stars": stars or 0, "count": count}
+                    for owner, name, stars, count in repo_facets
                 ],
                 "blueprints": [
                     {"path": path, "count": count} for path, count in blueprint_facets
