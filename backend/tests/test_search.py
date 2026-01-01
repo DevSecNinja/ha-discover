@@ -454,3 +454,127 @@ def test_combined_filters_with_action(test_db):
         test_db, "", limit=10, action_filter="light.turn_on"
     )
     assert len(results) == 2
+
+
+def test_action_filter_exact_match(test_db):
+    """Test that action filter matches exact action names, not substrings."""
+    repo = Repository(
+        name="test-repo",
+        owner="testuser",
+        description="Test repository",
+        url="https://github.com/testuser/test-repo",
+    )
+    test_db.add(repo)
+    test_db.commit()
+
+    # Create automations with similar action names
+    automation1 = Automation(
+        alias="Turn on light",
+        description="Basic light control",
+        trigger_types="state",
+        action_calls="light.turn_on",
+        source_file_path="automations.yaml",
+        github_url="https://github.com/testuser/test-repo/blob/main/automations.yaml",
+        repository_id=repo.id,
+    )
+    automation2 = Automation(
+        alias="Turn on light with brightness",
+        description="Advanced light control",
+        trigger_types="state",
+        action_calls="light.turn_on_brightness",
+        source_file_path="automations.yaml",
+        github_url="https://github.com/testuser/test-repo/blob/main/automations.yaml",
+        repository_id=repo.id,
+    )
+    automation3 = Automation(
+        alias="Multiple actions including turn_on",
+        description="Combined actions",
+        trigger_types="state",
+        action_calls="notify.mobile_app,light.turn_on,switch.turn_off",
+        source_file_path="automations.yaml",
+        github_url="https://github.com/testuser/test-repo/blob/main/automations.yaml",
+        repository_id=repo.id,
+    )
+    test_db.add(automation1)
+    test_db.add(automation2)
+    test_db.add(automation3)
+    test_db.commit()
+
+    # Filter by "light.turn_on" should match only exact matches
+    results = SearchService.search_automations(
+        test_db, "", limit=10, action_filter="light.turn_on"
+    )
+    assert len(results) == 2
+    aliases = {r["alias"] for r in results}
+    assert "Turn on light" in aliases
+    assert "Multiple actions including turn_on" in aliases
+    assert "Turn on light with brightness" not in aliases
+
+    # Filter by "light.turn_on_brightness" should match only that exact action
+    results = SearchService.search_automations(
+        test_db, "", limit=10, action_filter="light.turn_on_brightness"
+    )
+    assert len(results) == 1
+    assert results[0]["alias"] == "Turn on light with brightness"
+
+
+def test_trigger_filter_exact_match(test_db):
+    """Test that trigger filter matches exact trigger names, not substrings."""
+    repo = Repository(
+        name="test-repo",
+        owner="testuser",
+        description="Test repository",
+        url="https://github.com/testuser/test-repo",
+    )
+    test_db.add(repo)
+    test_db.commit()
+
+    # Create automations with similar trigger names
+    automation1 = Automation(
+        alias="State trigger",
+        description="State based",
+        trigger_types="state",
+        action_calls="light.turn_on",
+        source_file_path="automations.yaml",
+        github_url="https://github.com/testuser/test-repo/blob/main/automations.yaml",
+        repository_id=repo.id,
+    )
+    automation2 = Automation(
+        alias="Numeric state trigger",
+        description="Numeric state based",
+        trigger_types="numeric_state",
+        action_calls="light.turn_on",
+        source_file_path="automations.yaml",
+        github_url="https://github.com/testuser/test-repo/blob/main/automations.yaml",
+        repository_id=repo.id,
+    )
+    automation3 = Automation(
+        alias="Multiple triggers",
+        description="Combined triggers",
+        trigger_types="state,time,zone",
+        action_calls="light.turn_on",
+        source_file_path="automations.yaml",
+        github_url="https://github.com/testuser/test-repo/blob/main/automations.yaml",
+        repository_id=repo.id,
+    )
+    test_db.add(automation1)
+    test_db.add(automation2)
+    test_db.add(automation3)
+    test_db.commit()
+
+    # Filter by "state" should match only exact matches
+    results = SearchService.search_automations(
+        test_db, "", limit=10, trigger_filter="state"
+    )
+    assert len(results) == 2
+    aliases = {r["alias"] for r in results}
+    assert "State trigger" in aliases
+    assert "Multiple triggers" in aliases
+    assert "Numeric state trigger" not in aliases
+
+    # Filter by "numeric_state" should match only that exact trigger
+    results = SearchService.search_automations(
+        test_db, "", limit=10, trigger_filter="numeric_state"
+    )
+    assert len(results) == 1
+    assert results[0]["alias"] == "Numeric state trigger"

@@ -14,6 +14,31 @@ class SearchService:
     """Service for searching Home Assistant automations."""
 
     @staticmethod
+    def _exact_match_in_comma_list(column, value: str):
+        """
+        Create SQL condition for exact match in comma-separated list.
+        
+        Handles these cases:
+        - Single value: "value"
+        - First in list: "value,..."
+        - Middle of list: "...,value,..."
+        - Last in list: "...,value"
+        
+        Args:
+            column: SQLAlchemy column containing comma-separated values
+            value: The exact value to match
+            
+        Returns:
+            SQLAlchemy OR condition for exact matching
+        """
+        return or_(
+            column == value,  # Exact match (single value)
+            column.like(f"{value},%"),  # First in list
+            column.like(f"%,{value},%"),  # Middle of list
+            column.like(f"%,{value}"),  # Last in list
+        )
+
+    @staticmethod
     def search_automations(
         db: Session,
         query: str,
@@ -94,16 +119,20 @@ class SearchService:
 
             # Apply trigger filter
             if trigger_filter:
-                # Trigger types are stored as comma-separated, use LIKE
+                # Trigger types are stored as comma-separated, use exact match
                 base_query = base_query.filter(
-                    Automation.trigger_types.like(f"%{trigger_filter}%")
+                    SearchService._exact_match_in_comma_list(
+                        Automation.trigger_types, trigger_filter
+                    )
                 )
 
             # Apply action filter
             if action_filter:
-                # Action calls are stored as comma-separated, use LIKE
+                # Action calls are stored as comma-separated, use exact match
                 base_query = base_query.filter(
-                    Automation.action_calls.like(f"%{action_filter}%")
+                    SearchService._exact_match_in_comma_list(
+                        Automation.action_calls, action_filter
+                    )
                 )
 
             results = base_query.limit(limit).all()
@@ -318,11 +347,15 @@ class SearchService:
                 )
             if trigger_filter:
                 repo_query = repo_query.filter(
-                    Automation.trigger_types.like(f"%{trigger_filter}%")
+                    SearchService._exact_match_in_comma_list(
+                        Automation.trigger_types, trigger_filter
+                    )
                 )
             if action_filter:
                 repo_query = repo_query.filter(
-                    Automation.action_calls.like(f"%{action_filter}%")
+                    SearchService._exact_match_in_comma_list(
+                        Automation.action_calls, action_filter
+                    )
                 )
 
             repo_facets = (
@@ -346,11 +379,15 @@ class SearchService:
                 )
             if trigger_filter:
                 blueprint_query = blueprint_query.filter(
-                    Automation.trigger_types.like(f"%{trigger_filter}%")
+                    SearchService._exact_match_in_comma_list(
+                        Automation.trigger_types, trigger_filter
+                    )
                 )
             if action_filter:
                 blueprint_query = blueprint_query.filter(
-                    Automation.action_calls.like(f"%{action_filter}%")
+                    SearchService._exact_match_in_comma_list(
+                        Automation.action_calls, action_filter
+                    )
                 )
 
             blueprint_facets = (
@@ -377,7 +414,9 @@ class SearchService:
                 )
             if action_filter:
                 trigger_query = trigger_query.filter(
-                    Automation.action_calls.like(f"%{action_filter}%")
+                    SearchService._exact_match_in_comma_list(
+                        Automation.action_calls, action_filter
+                    )
                 )
 
             # Get all trigger types and aggregate
@@ -414,7 +453,9 @@ class SearchService:
                 )
             if trigger_filter:
                 action_query = action_query.filter(
-                    Automation.trigger_types.like(f"%{trigger_filter}%")
+                    SearchService._exact_match_in_comma_list(
+                        Automation.trigger_types, trigger_filter
+                    )
                 )
 
             # Get all action calls and aggregate
