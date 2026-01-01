@@ -63,7 +63,7 @@ jobs:
 
             // Bug related keywords
             const bugPattern =
-              /bug|error|crash|fail|broken|issue|problem|not working/;
+              /bug|error|crash|fail|broken|problem|not working/;
             if (text.match(bugPattern)) {
               labels.push('bug');
             }

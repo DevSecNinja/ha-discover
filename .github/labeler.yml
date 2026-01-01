@@ -39,8 +39,6 @@ documentation:
   - changed-files:
       - any-glob-to-any-file:
           - '**/*.md'
-          - 'ARCHITECTURE.md'
-          - 'README.md'
           - '.github/copilot-instructions.md'
 
 # Docker configuration
