@@ -82,7 +82,7 @@ jobs:
       version: ${{ needs.determine-version.outputs.version }}
       context_path: "./backend"
       update_version_script: "update-backend-version.sh"
-      is_prerelease: ${{ needs.determine-version.outputs.is_prerelease }}
+      is_prerelease: ${{ fromJSON(needs.determine-version.outputs.is_prerelease) }}
 
   scan-backend:
     needs: [build-and-push-backend]
@@ -109,7 +109,7 @@ jobs:
       version: ${{ needs.determine-version.outputs.version }}
       context_path: "./frontend"
       update_version_script: "update-frontend-version.sh"
-      is_prerelease: ${{ needs.determine-version.outputs.is_prerelease }}
+      is_prerelease: ${{ fromJSON(needs.determine-version.outputs.is_prerelease) }}
       build_args: |
         NEXT_PUBLIC_API_URL=${{ vars.FRONTEND_API_URL || 'http://localhost:8000/api/v1' }}
 
