@@ -771,8 +771,6 @@ export default function Home() {
                       border: isDark
                         ? "1px solid rgba(255, 255, 255, 0.08)"
                         : "1px solid rgba(0, 0, 0, 0.08)",
-                      maxHeight: isMobile ? "none" : "calc(100vh - 200px)",
-                      overflowY: isMobile ? "visible" : "auto",
                     }}
                   >
                     {/* Active Filters */}
@@ -919,7 +917,7 @@ export default function Home() {
                           📦 Repositories
                         </h3>
                         <div
-                          className={`space-y-2 pb-1 ${isMobile ? "max-h-48" : "max-h-64"} overflow-y-auto`}
+                          className="space-y-2 pb-1"
                         >
                           {facets.repositories.map((repo) => {
                             const repoKey = `${repo.owner}/${repo.name}`;
@@ -1060,7 +1058,7 @@ export default function Home() {
                           🎨 Blueprints
                         </h3>
                         <div
-                          className={`space-y-2 pb-1 ${isMobile ? "max-h-48" : "max-h-64"} overflow-y-auto`}
+                          className="space-y-2 pb-1"
                         >
                           {facets.blueprints.map((blueprint) => {
                             const isSelected =
@@ -1178,7 +1176,7 @@ export default function Home() {
                           ⚡ Triggers
                         </h3>
                         <div
-                          className={`space-y-2 pb-1 ${isMobile ? "max-h-48" : "max-h-64"} overflow-y-auto`}
+                          className="space-y-2 pb-1"
                         >
                           {facets.triggers.map((trigger) => {
                             const isSelected = selectedTrigger === trigger.type;
@@ -1292,7 +1290,7 @@ export default function Home() {
                           🎬 Actions
                         </h3>
                         <div
-                          className={`space-y-2 pb-1 ${isMobile ? "max-h-48" : "max-h-64"} overflow-y-auto`}
+                          className="space-y-2 pb-1"
                         >
                           {facets.actions.map((action) => {
                             const isSelected = selectedAction === action.call;
