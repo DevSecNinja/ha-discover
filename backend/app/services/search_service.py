@@ -14,6 +14,43 @@ class SearchService:
     """Service for searching Home Assistant automations."""
 
     @staticmethod
+    def _escape_like(value: str, escape_char: str = "\\") -> str:
+        """Escape SQL LIKE wildcard characters in a value."""
+        # First escape the escape character itself, then '%' and '_'
+        escaped = value.replace(escape_char, escape_char + escape_char)
+        escaped = escaped.replace("%", escape_char + "%")
+        escaped = escaped.replace("_", escape_char + "_")
+        return escaped
+
+    @staticmethod
+    def _exact_match_in_comma_list(column, value: str):
+        """
+        Create SQL condition for exact match in comma-separated list.
+
+        Handles these cases:
+        - Single value: "value"
+        - First in list: "value,..."
+        - Middle of list: "...,value,..."
+        - Last in list: "...,value"
+
+        Args:
+            column: SQLAlchemy column containing comma-separated values
+            value: The exact value to match
+
+        Returns:
+            SQLAlchemy OR condition for exact matching
+        """
+        escape_char = "\\"
+        escaped_value = SearchService._escape_like(value, escape_char=escape_char)
+
+        return or_(
+            column == value,  # Exact match (single value)
+            column.like(f"{escaped_value},%", escape=escape_char),  # First in list
+            column.like(f"%,{escaped_value},%", escape=escape_char),  # Middle of list
+            column.like(f"%,{escaped_value}", escape=escape_char),  # Last in list
+        )
+
+    @staticmethod
     def search_automations(
         db: Session,
         query: str,
@@ -21,6 +58,7 @@ class SearchService:
         repo_filter: Optional[str] = None,
         blueprint_filter: Optional[str] = None,
         trigger_filter: Optional[str] = None,
+        action_filter: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
         """
         Search automations by text query across multiple fields.
@@ -32,6 +70,7 @@ class SearchService:
             repo_filter: Filter by repository (format: "owner/name")
             blueprint_filter: Filter by blueprint path
             trigger_filter: Filter by trigger type
+            action_filter: Filter by action call (service name)
 
         Returns:
             List of automation results with repository information
@@ -41,6 +80,7 @@ class SearchService:
             and not repo_filter
             and not blueprint_filter
             and not trigger_filter
+            and not action_filter
         ):
             # Return recent automations if no query or filters
             return SearchService._get_recent_automations(db, limit)
@@ -61,6 +101,9 @@ class SearchService:
                             func.lower(search_pattern)
                         ),
                         func.lower(Automation.trigger_types).like(
+                            func.lower(search_pattern)
+                        ),
+                        func.lower(Automation.action_calls).like(
                             func.lower(search_pattern)
                         ),
                         func.lower(Repository.owner).like(func.lower(search_pattern)),
@@ -88,9 +131,20 @@ class SearchService:
 
             # Apply trigger filter
             if trigger_filter:
-                # Trigger types are stored as comma-separated, use LIKE
+                # Trigger types are stored as comma-separated, use exact match
                 base_query = base_query.filter(
-                    Automation.trigger_types.like(f"%{trigger_filter}%")
+                    SearchService._exact_match_in_comma_list(
+                        Automation.trigger_types, trigger_filter
+                    )
+                )
+
+            # Apply action filter
+            if action_filter:
+                # Action calls are stored as comma-separated, use exact match
+                base_query = base_query.filter(
+                    SearchService._exact_match_in_comma_list(
+                        Automation.action_calls, action_filter
+                    )
                 )
 
             results = base_query.limit(limit).all()
@@ -254,6 +308,7 @@ class SearchService:
         repo_filter: Optional[str] = None,
         blueprint_filter: Optional[str] = None,
         trigger_filter: Optional[str] = None,
+        action_filter: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
         Get facets (aggregated counts) for filters.
@@ -264,9 +319,10 @@ class SearchService:
             repo_filter: Currently selected repository filter
             blueprint_filter: Currently selected blueprint filter
             trigger_filter: Currently selected trigger filter
+            action_filter: Currently selected action filter
 
         Returns:
-            Dictionary with facets for repositories, blueprints, and triggers
+            Dictionary with facets for repositories, blueprints, triggers, and actions
         """
         try:
             # Build base query with current filters (except the one we're aggregating)
@@ -286,6 +342,9 @@ class SearchService:
                         func.lower(Automation.trigger_types).like(
                             func.lower(search_pattern)
                         ),
+                        func.lower(Automation.action_calls).like(
+                            func.lower(search_pattern)
+                        ),
                         func.lower(Repository.owner).like(func.lower(search_pattern)),
                         func.lower(Repository.name).like(func.lower(search_pattern)),
                         func.lower(Repository.description).like(
@@ -302,7 +361,15 @@ class SearchService:
                 )
             if trigger_filter:
                 repo_query = repo_query.filter(
-                    Automation.trigger_types.like(f"%{trigger_filter}%")
+                    SearchService._exact_match_in_comma_list(
+                        Automation.trigger_types, trigger_filter
+                    )
+                )
+            if action_filter:
+                repo_query = repo_query.filter(
+                    SearchService._exact_match_in_comma_list(
+                        Automation.action_calls, action_filter
+                    )
                 )
 
             repo_facets = (
@@ -327,7 +394,15 @@ class SearchService:
                 )
             if trigger_filter:
                 blueprint_query = blueprint_query.filter(
-                    Automation.trigger_types.like(f"%{trigger_filter}%")
+                    SearchService._exact_match_in_comma_list(
+                        Automation.trigger_types, trigger_filter
+                    )
+                )
+            if action_filter:
+                blueprint_query = blueprint_query.filter(
+                    SearchService._exact_match_in_comma_list(
+                        Automation.action_calls, action_filter
+                    )
                 )
 
             blueprint_facets = (
@@ -352,6 +427,12 @@ class SearchService:
                 trigger_query = trigger_query.filter(
                     Automation.blueprint_path == blueprint_filter
                 )
+            if action_filter:
+                trigger_query = trigger_query.filter(
+                    SearchService._exact_match_in_comma_list(
+                        Automation.action_calls, action_filter
+                    )
+                )
 
             # Get all trigger types and aggregate
             all_triggers = (
@@ -374,6 +455,45 @@ class SearchService:
                 trigger_counts.items(), key=lambda x: x[1], reverse=True
             )[:20]
 
+            # Get action facets (excluding current action filter)
+            action_query = base_query
+            if repo_filter and "/" in repo_filter:
+                owner, name = repo_filter.split("/", 1)
+                action_query = action_query.filter(
+                    Repository.owner == owner, Repository.name == name
+                )
+            if blueprint_filter:
+                action_query = action_query.filter(
+                    Automation.blueprint_path == blueprint_filter
+                )
+            if trigger_filter:
+                action_query = action_query.filter(
+                    SearchService._exact_match_in_comma_list(
+                        Automation.trigger_types, trigger_filter
+                    )
+                )
+
+            # Get all action calls and aggregate
+            all_actions = (
+                action_query.filter(Automation.action_calls.isnot(None))
+                .with_entities(Automation.action_calls)
+                .all()
+            )
+
+            # Parse comma-separated action calls and count
+            action_counts: Dict[str, int] = {}
+            for (action_str,) in all_actions:
+                if action_str:
+                    for action in action_str.split(","):
+                        action = action.strip()
+                        if action:
+                            action_counts[action] = action_counts.get(action, 0) + 1
+
+            # Sort by count and limit
+            action_facets = sorted(
+                action_counts.items(), key=lambda x: x[1], reverse=True
+            )[:20]
+
             return {
                 "repositories": [
                     {"owner": owner, "name": name, "stars": stars or 0, "count": count}
@@ -386,8 +506,12 @@ class SearchService:
                     {"type": trigger, "count": count}
                     for trigger, count in trigger_facets
                 ],
+                "actions": [
+                    {"call": action, "count": count}
+                    for action, count in action_facets
+                ],
             }
 
         except Exception as e:
             logger.error(f"Error getting facets: {e}")
-            return {"repositories": [], "blueprints": [], "triggers": []}
+            return {"repositories": [], "blueprints": [], "triggers": [], "actions": []}

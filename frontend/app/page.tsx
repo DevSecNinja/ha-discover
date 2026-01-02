@@ -42,10 +42,16 @@ interface TriggerFacet {
   count: number;
 }
 
+interface ActionFacet {
+  call: string;
+  count: number;
+}
+
 interface Facets {
   repositories: RepositoryFacet[];
   blueprints: BlueprintFacet[];
   triggers: TriggerFacet[];
+  actions: ActionFacet[];
 }
 
 interface SearchResponse {
@@ -97,12 +103,14 @@ export default function Home() {
     repositories: [],
     blueprints: [],
     triggers: [],
+    actions: [],
   });
   const [selectedRepo, setSelectedRepo] = useState<string | null>(null);
   const [selectedBlueprint, setSelectedBlueprint] = useState<string | null>(
     null,
   );
   const [selectedTrigger, setSelectedTrigger] = useState<string | null>(null);
+  const [selectedAction, setSelectedAction] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -172,6 +180,7 @@ export default function Home() {
       if (selectedRepo) params.append("repo", selectedRepo);
       if (selectedBlueprint) params.append("blueprint", selectedBlueprint);
       if (selectedTrigger) params.append("trigger", selectedTrigger);
+      if (selectedAction) params.append("action", selectedAction);
 
       const response = await fetch(
         `${API_BASE_URL}/search?${params.toString()}`,
@@ -199,7 +208,7 @@ export default function Home() {
   // biome-ignore lint/correctness/useExhaustiveDependencies: Filter changes should trigger search
   useEffect(() => {
     performSearch(query);
-  }, [selectedRepo, selectedBlueprint, selectedTrigger]);
+  }, [selectedRepo, selectedBlueprint, selectedTrigger, selectedAction]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -687,7 +696,8 @@ export default function Home() {
           {/* Filter Section */}
           {(facets.repositories.length > 0 ||
             facets.blueprints.length > 0 ||
-            facets.triggers.length > 0) && (
+            facets.triggers.length > 0 ||
+            facets.actions.length > 0) && (
             <>
               <aside
                 className={`
@@ -766,7 +776,7 @@ export default function Home() {
                     }}
                   >
                     {/* Active Filters */}
-                    {(selectedRepo || selectedBlueprint || selectedTrigger) && (
+                    {(selectedRepo || selectedBlueprint || selectedTrigger || selectedAction) && (
                       <div
                         className="pb-4 border-b"
                         style={{
@@ -790,6 +800,7 @@ export default function Home() {
                               setSelectedRepo(null);
                               setSelectedBlueprint(null);
                               setSelectedTrigger(null);
+                              setSelectedAction(null);
                             }}
                             className="text-xs px-2 py-1 rounded-lg transition-colors"
                             style={{
@@ -861,6 +872,28 @@ export default function Home() {
                               <button
                                 type="button"
                                 onClick={() => setSelectedTrigger(null)}
+                                className="ml-2 hover:opacity-70"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          )}
+                          {selectedAction && (
+                            <div
+                              className="flex items-center justify-between text-sm px-3 py-2 rounded-lg"
+                              style={{
+                                background: isDark
+                                  ? "rgba(251, 191, 36, 0.15)"
+                                  : "rgba(245, 158, 11, 0.1)",
+                                color: isDark ? "#fbbf24" : "#d97706",
+                              }}
+                            >
+                              <span className="truncate font-mono text-xs">
+                                {selectedAction}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => setSelectedAction(null)}
                                 className="ml-2 hover:opacity-70"
                               >
                                 ✕
@@ -1235,6 +1268,120 @@ export default function Home() {
                                     }}
                                   >
                                     {trigger.count}
+                                  </span>
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Action Filter */}
+                    {facets.actions.length > 0 && (
+                      <div>
+                        <h3
+                          className="text-sm font-semibold mb-3"
+                          style={{
+                            color: isDark ? "#e0e7ff" : "#1f2937",
+                          }}
+                        >
+                          🎬 Actions
+                        </h3>
+                        <div
+                          className={`space-y-2 pb-1 ${isMobile ? "max-h-48" : "max-h-64"} overflow-y-auto`}
+                        >
+                          {facets.actions.map((action) => {
+                            const isSelected = selectedAction === action.call;
+                            return (
+                              <button
+                                key={action.call}
+                                type="button"
+                                onClick={() =>
+                                  setSelectedAction(
+                                    isSelected ? null : action.call,
+                                  )
+                                }
+                                className="w-full text-left px-3 py-2 rounded-lg transition-all duration-150"
+                                style={{
+                                  background: isSelected
+                                    ? isDark
+                                      ? "rgba(251, 191, 36, 0.2)"
+                                      : "rgba(245, 158, 11, 0.15)"
+                                    : isDark
+                                      ? "rgba(255, 255, 255, 0.05)"
+                                      : "rgba(0, 0, 0, 0.03)",
+                                  border: isSelected
+                                    ? isDark
+                                      ? "1px solid rgba(251, 191, 36, 0.4)"
+                                      : "1px solid rgba(245, 158, 11, 0.3)"
+                                    : isDark
+                                      ? "1px solid rgba(255, 255, 255, 0.05)"
+                                      : "1px solid rgba(0, 0, 0, 0.05)",
+                                }}
+                                onMouseEnter={(e) => {
+                                  if (isDark) {
+                                    e.currentTarget.style.background =
+                                      isSelected
+                                        ? "rgba(251, 191, 36, 0.3)"
+                                        : "rgba(255, 255, 255, 0.1)";
+                                    e.currentTarget.style.boxShadow =
+                                      "0 4px 12px rgba(0, 0, 0, 0.2)";
+                                  } else {
+                                    e.currentTarget.style.background =
+                                      isSelected
+                                        ? "rgba(245, 158, 11, 0.2)"
+                                        : "rgba(0, 0, 0, 0.05)";
+                                    e.currentTarget.style.boxShadow =
+                                      "0 2px 8px rgba(0, 0, 0, 0.08)";
+                                  }
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.background = isSelected
+                                    ? isDark
+                                      ? "rgba(251, 191, 36, 0.2)"
+                                      : "rgba(245, 158, 11, 0.15)"
+                                    : isDark
+                                      ? "rgba(255, 255, 255, 0.05)"
+                                      : "rgba(0, 0, 0, 0.03)";
+                                  e.currentTarget.style.boxShadow = "none";
+                                }}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <span
+                                    className="text-sm truncate font-mono"
+                                    style={{
+                                      color: isSelected
+                                        ? isDark
+                                          ? "#fbbf24"
+                                          : "#d97706"
+                                        : isDark
+                                          ? "rgba(255, 255, 255, 0.8)"
+                                          : "rgba(0, 0, 0, 0.8)",
+                                    }}
+                                  >
+                                    {action.call}
+                                  </span>
+                                  <span
+                                    className="text-xs font-medium px-2 py-0.5 rounded-full ml-2"
+                                    style={{
+                                      background: isSelected
+                                        ? isDark
+                                          ? "rgba(251, 191, 36, 0.3)"
+                                          : "rgba(245, 158, 11, 0.2)"
+                                        : isDark
+                                          ? "rgba(255, 255, 255, 0.1)"
+                                          : "rgba(0, 0, 0, 0.08)",
+                                      color: isSelected
+                                        ? isDark
+                                          ? "#fbbf24"
+                                          : "#d97706"
+                                        : isDark
+                                          ? "rgba(255, 255, 255, 0.6)"
+                                          : "rgba(0, 0, 0, 0.6)",
+                                    }}
+                                  >
+                                    {action.count}
                                   </span>
                                 </div>
                               </button>
