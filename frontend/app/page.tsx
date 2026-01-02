@@ -191,6 +191,7 @@ export default function Home() {
       console.error("Error searching:", error);
       setResults([]);
       setTotalResults(0);
+      setCurrentPage(1);
     } finally {
       setLoading(false);
     }
