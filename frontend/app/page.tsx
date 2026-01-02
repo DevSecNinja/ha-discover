@@ -1751,8 +1751,8 @@ export default function Home() {
                     Edit in YAML, then paste your code
                   </li>
                   <li>
-                    <strong>Customize</strong> - Update entity names and settings
-                    to match your setup
+                    <strong>Customize</strong> - Update entity names and
+                    settings to match your setup
                   </li>
                   <li>
                     <strong>Save</strong> - Save your automation and test it!

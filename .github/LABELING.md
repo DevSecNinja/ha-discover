@@ -15,7 +15,7 @@ PRs are automatically labeled based on the files changed:
 - **tests** - Changes to test files or test configuration
 - **configuration** - Changes to configuration files (linters, git config, etc.)
 
-### How It Works
+### PR Labeler - How It Works
 
 The PR labeler runs automatically when a PR is:
 - Opened
@@ -39,7 +39,7 @@ Issues are automatically labeled based on keywords in the title and body:
 - **performance** - Keywords: performance, slow, optimize, speed, latency, memory
 - **dependencies** - Keywords: dependency, dependencies, package, npm, pip, upgrade, update version
 
-### How It Works
+### Issue Labeler - How It Works
 
 The issue labeler runs automatically when an issue is:
 - Opened
