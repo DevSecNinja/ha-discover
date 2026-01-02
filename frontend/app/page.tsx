@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 interface Repository {
   name: string;
@@ -125,6 +125,9 @@ export default function Home() {
     () => Math.ceil(totalResults / perPage),
     [totalResults, perPage],
   );
+
+  // Ref for scrolling to results
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Load theme preference from localStorage
@@ -1416,7 +1419,7 @@ export default function Home() {
           )}
 
           {/* Results */}
-          <div className="space-y-4 flex-1">
+          <div className="space-y-4 flex-1" ref={resultsRef}>
             {loading ? (
               <div className="text-center py-20">
                 <div
@@ -1774,7 +1777,7 @@ export default function Home() {
                   onClick={() => {
                     const newPage = currentPage - 1;
                     performSearch(query, newPage);
-                    window.scrollTo({ top: 0, behavior: "smooth" });
+                    resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
                   }}
                   disabled={currentPage === 1}
                   aria-label="Go to previous page"
@@ -1826,7 +1829,7 @@ export default function Home() {
                   onClick={() => {
                     const newPage = currentPage + 1;
                     performSearch(query, newPage);
-                    window.scrollTo({ top: 0, behavior: "smooth" });
+                    resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
                   }}
                   disabled={currentPage >= totalPages}
                   aria-label="Go to next page"
