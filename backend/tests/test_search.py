@@ -1063,8 +1063,8 @@ def test_action_domain_filter_with_wildcards(test_db):
     test_db.commit()
 
     # Filter by "light_turn" domain should match only exact underscore
-    results = SearchService.search_automations(
-        test_db, "", limit=10, action_domain_filter="light_turn"
+    results, total = SearchService.search_automations(
+        test_db, "", page=1, per_page=10, action_domain_filter="light_turn"
     )
     assert len(results) == 1
     assert results[0]["alias"] == "Underscore domain"
