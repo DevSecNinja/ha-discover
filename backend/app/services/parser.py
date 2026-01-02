@@ -3,7 +3,7 @@
 import logging
 from typing import Any, Dict, List, Optional
 
-import yaml
+import yaml  # type: ignore[import-untyped]
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ class AutomationParser:
         Returns:
             List of automation dictionaries with extracted metadata including line numbers
         """
-        automations = []
+        automations: List[Dict[str, Any]] = []
 
         try:
             # Parse YAML content with line numbers
@@ -199,7 +199,7 @@ class AutomationParser:
         Returns:
             List of unique trigger types
         """
-        trigger_types = []
+        trigger_types: List[str] = []
 
         try:
             # Normalize to list

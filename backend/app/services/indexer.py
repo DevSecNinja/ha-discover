@@ -2,6 +2,7 @@
 
 import logging
 from datetime import datetime, timezone
+from typing import Optional
 
 import httpx
 from app.models.database import Automation, IndexingMetadata, Repository
@@ -15,7 +16,7 @@ logger = logging.getLogger(__name__)
 class IndexingService:
     """Service for indexing Home Assistant automations from GitHub repositories."""
 
-    def __init__(self, github_token: str = None):
+    def __init__(self, github_token: Optional[str] = None):
         """Initialize indexing service with GitHub API access."""
         self.github_service = GitHubService(token=github_token)
         self.parser = AutomationParser()

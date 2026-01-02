@@ -3,9 +3,13 @@
 from datetime import datetime, timezone
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
-from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy.orm import DeclarativeBase, relationship
 
-Base = declarative_base()
+
+class Base(DeclarativeBase):
+    """Base class for all database models."""
+
+    pass
 
 
 class Repository(Base):
