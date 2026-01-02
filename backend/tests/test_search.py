@@ -1004,23 +1004,33 @@ def test_combined_filters_with_action_domain(test_db):
     test_db.commit()
 
     # Filter by action domain + trigger
-    results = SearchService.search_automations(
-        test_db, "", limit=10, action_domain_filter="light", trigger_filter="state"
+    results, _ = SearchService.search_automations(
+        test_db,
+        "",
+        page=1,
+        per_page=10,
+        action_domain_filter="light",
+        trigger_filter="state",
     )
     assert len(results) == 1
     assert results[0]["alias"] == "Light state trigger"
 
     # Filter by action domain only
-    results = SearchService.search_automations(
-        test_db, "", limit=10, action_domain_filter="light"
+    results, _ = SearchService.search_automations(
+        test_db,
+        "",
+        page=1,
+        per_page=10,
+        action_domain_filter="light",
     )
     assert len(results) == 2
 
     # Filter by action domain and specific action
-    results = SearchService.search_automations(
+    results, _ = SearchService.search_automations(
         test_db,
         "",
-        limit=10,
+        page=1,
+        per_page=10,
         action_domain_filter="light",
         action_filter="light.turn_on",
     )
