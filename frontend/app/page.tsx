@@ -395,7 +395,6 @@ export default function Home() {
               width={120}
               height={106}
               priority
-              className="drop-shadow-lg"
               style={{
                 filter: isDark
                   ? "drop-shadow(0 4px 12px rgba(18, 188, 242, 0.3))"
