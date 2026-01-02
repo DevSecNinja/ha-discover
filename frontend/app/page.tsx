@@ -129,7 +129,7 @@ export default function Home() {
   const [isMobile, setIsMobile] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
-  const [perPage] = useState(30); // Fixed at 30 per requirement
+  const [perPage] = useState(15); // Fixed at 15 per requirement
 
   // Calculate total pages for pagination
   const totalPages = useMemo(

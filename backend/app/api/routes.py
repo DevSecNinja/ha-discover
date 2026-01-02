@@ -143,7 +143,7 @@ class IndexStatusResponse(BaseModel):
 async def search_automations(
     q: str = "",
     page: int = 1,
-    per_page: int = 30,
+    per_page: int = 15,
     repo: Optional[str] = None,
     blueprint: Optional[str] = None,
     trigger: Optional[str] = None,
@@ -157,7 +157,7 @@ async def search_automations(
     Args:
         q: Search query string (searches across automation name, description, triggers, actions, and repository)
         page: Page number (default: 1, min: 1)
-        per_page: Results per page (default: 30, max: 100)
+        per_page: Results per page (default: 15, max: 100)
         repo: Filter by repository (format: "owner/name")
         blueprint: Filter by blueprint path
         trigger: Filter by trigger type

@@ -70,7 +70,7 @@ class SearchService:
         db: Session,
         query: str,
         page: int = 1,
-        per_page: int = 30,
+        per_page: int = 15,
         repo_filter: Optional[str] = None,
         blueprint_filter: Optional[str] = None,
         trigger_filter: Optional[str] = None,
