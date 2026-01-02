@@ -1,7 +1,7 @@
 """Search service for querying Home Assistant automations."""
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from app.models.database import Automation, IndexingMetadata, Repository
 from sqlalchemy import func, or_
@@ -54,26 +54,28 @@ class SearchService:
     def search_automations(
         db: Session,
         query: str,
-        limit: int = 50,
+        page: int = 1,
+        per_page: int = 30,
         repo_filter: Optional[str] = None,
         blueprint_filter: Optional[str] = None,
         trigger_filter: Optional[str] = None,
         action_filter: Optional[str] = None,
-    ) -> List[Dict[str, Any]]:
+    ) -> Tuple[List[Dict[str, Any]], int]:
         """
         Search automations by text query across multiple fields.
 
         Args:
             db: Database session
             query: Search query string
-            limit: Maximum number of results to return
+            page: Page number (1-indexed)
+            per_page: Number of results per page
             repo_filter: Filter by repository (format: "owner/name")
             blueprint_filter: Filter by blueprint path
             trigger_filter: Filter by trigger type
             action_filter: Filter by action call (service name)
 
         Returns:
-            List of automation results with repository information
+            Tuple of (list of automation results with repository information, total count)
         """
         if (
             not query
@@ -83,7 +85,7 @@ class SearchService:
             and not action_filter
         ):
             # Return recent automations if no query or filters
-            return SearchService._get_recent_automations(db, limit)
+            return SearchService._get_recent_automations(db, page, per_page)
 
         try:
             # Build query with filters
@@ -147,7 +149,12 @@ class SearchService:
                     )
                 )
 
-            results = base_query.limit(limit).all()
+            # Get total count before pagination
+            total = base_query.count()
+
+            # Apply pagination
+            offset = (page - 1) * per_page
+            results = base_query.offset(offset).limit(per_page).all()
 
             # Format results
             formatted_results = []
@@ -188,32 +195,45 @@ class SearchService:
                 )
 
             logger.info(
-                f"Search query '{query}' returned {len(formatted_results)} results"
+                f"Search query '{query}' returned {len(formatted_results)} results (page {page}, total {total})"
             )
-            return formatted_results
+            return formatted_results, total
 
         except Exception as e:
             logger.error(f"Error searching automations: {e}")
-            return []
+            return [], 0
 
     @staticmethod
-    def _get_recent_automations(db: Session, limit: int) -> List[Dict[str, Any]]:
+    def _get_recent_automations(
+        db: Session, page: int, per_page: int
+    ) -> Tuple[List[Dict[str, Any]], int]:
         """
         Get most recently indexed automations.
 
         Args:
             db: Database session
-            limit: Maximum number of results
+            page: Page number (1-indexed)
+            per_page: Number of results per page
 
         Returns:
-            List of recent automations
+            Tuple of (list of recent automations, total count)
         """
         try:
+            # Get total count
+            total = (
+                db.query(Automation)
+                .join(Repository, Automation.repository_id == Repository.id)
+                .count()
+            )
+
+            # Apply pagination
+            offset = (page - 1) * per_page
             results = (
                 db.query(Automation, Repository)
                 .join(Repository, Automation.repository_id == Repository.id)
-                .order_by(func.random())
-                .limit(limit)
+                .order_by(Automation.indexed_at.desc(), Automation.id.desc())
+                .offset(offset)
+                .limit(per_page)
                 .all()
             )
 
@@ -254,11 +274,11 @@ class SearchService:
                     }
                 )
 
-            return formatted_results
+            return formatted_results, total
 
         except Exception as e:
             logger.error(f"Error getting recent automations: {e}")
-            return []
+            return [], 0
 
     @staticmethod
     def get_statistics(db: Session) -> Dict[str, Any]:

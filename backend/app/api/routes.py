@@ -100,6 +100,9 @@ class SearchResponse(BaseModel):
     query: str
     results: List[AutomationResponse]
     count: int
+    total: int
+    page: int
+    per_page: int
     facets: Facets
 
 
@@ -131,7 +134,8 @@ class IndexStatusResponse(BaseModel):
 @router.get("/search", response_model=SearchResponse)
 async def search_automations(
     q: str = "",
-    limit: int = 50,
+    page: int = 1,
+    per_page: int = 30,
     repo: Optional[str] = None,
     blueprint: Optional[str] = None,
     trigger: Optional[str] = None,
@@ -143,7 +147,8 @@ async def search_automations(
 
     Args:
         q: Search query string (searches across automation name, description, triggers, actions, and repository)
-        limit: Maximum number of results (default: 50, max: 100)
+        page: Page number (default: 1, min: 1)
+        per_page: Results per page (default: 30, max: 100)
         repo: Filter by repository (format: "owner/name")
         blueprint: Filter by blueprint path
         trigger: Filter by trigger type
@@ -153,13 +158,19 @@ async def search_automations(
     Returns:
         Search results with matching automations and facets for filtering
     """
-    if limit > 100:
-        limit = 100
+    # Validate and constrain parameters
+    if page < 1:
+        page = 1
+    if per_page > 100:
+        per_page = 100
+    if per_page < 10:
+        per_page = 10
 
-    results = SearchService.search_automations(
+    results, total = SearchService.search_automations(
         db,
         q,
-        limit,
+        page=page,
+        per_page=per_page,
         repo_filter=repo,
         blueprint_filter=blueprint,
         trigger_filter=trigger,
@@ -175,7 +186,15 @@ async def search_automations(
         action_filter=action,
     )
 
-    return {"query": q, "results": results, "count": len(results), "facets": facets}
+    return {
+        "query": q,
+        "results": results,
+        "count": len(results),
+        "total": total,
+        "page": page,
+        "per_page": per_page,
+        "facets": facets,
+    }
 
 
 @router.get("/statistics", response_model=StatisticsResponse)
