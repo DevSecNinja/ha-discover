@@ -6,10 +6,7 @@ on:
       - 'v*.*.*'
 
 permissions:
-  contents: write
-  packages: write
-  id-token: write
-  pages: write
+  contents: read
 
 env:
   REGISTRY: ghcr.io
@@ -22,6 +19,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Setup Python
         uses: actions/setup-python@v6
@@ -45,11 +44,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Get version
         id: get_version
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          GIT_REF: ${{ github.ref }}
         run: |
-          OUTPUT=$(.github/scripts/extract-version.sh "${{ github.event_name }}" "" "${{ github.ref }}")
+          OUTPUT=$(.github/scripts/extract-version.sh "$EVENT_NAME" "" "$GIT_REF")
           echo "$OUTPUT" >> $GITHUB_OUTPUT
 
           # Extract version for validation
@@ -60,11 +64,15 @@ jobs:
 
       - name: Check if prerelease
         id: check_prerelease
+        env:
+          VERSION: ${{ steps.get_version.outputs.version }}
         run: |
-          OUTPUT=$(.github/scripts/check-if-prerelease.sh "${{ steps.get_version.outputs.version }}" "")
+          OUTPUT=$(.github/scripts/check-if-prerelease.sh "$VERSION" "")
           echo "$OUTPUT" >> $GITHUB_OUTPUT
 
   build-and-push-backend:
+    permissions:
+      packages: write
     needs: [test, determine-version]
     uses: ./.github/workflows/build-and-push-image.yml
     with:
@@ -89,6 +97,8 @@ jobs:
       security-events: write
 
   build-and-push-frontend:
+    permissions:
+      packages: write
     needs: [test, determine-version]
     uses: ./.github/workflows/build-and-push-image.yml
     with:
@@ -115,14 +125,18 @@ jobs:
       security-events: write
 
   create-release:
+    permissions:
+      contents: write
     needs: [determine-version, scan-backend, scan-frontend]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@e7a8f85e1c67a31e6ed99a94b41bd0b71bbee6b8  # v2
         with:
           tag_name: ${{ needs.determine-version.outputs.version_tag }}
           name: ${{ needs.determine-version.outputs.version }}
@@ -164,6 +178,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Setup Node
         uses: actions/setup-node@v6
@@ -192,6 +208,9 @@ jobs:
           path: ./frontend/out
 
   deploy-pages:
+    permissions:
+      pages: write
+      id-token: write
     # This job requires manual approval via GitHub environment protection rules
     # Configure the 'github-pages' environment in repository settings to add required reviewers
     environment:

@@ -18,6 +18,7 @@ PRs are automatically labeled based on the files changed:
 ### PR Labeler - How It Works
 
 The PR labeler runs automatically when a PR is:
+
 - Opened
 - Updated (new commits pushed)
 - Reopened
@@ -42,6 +43,7 @@ Issues are automatically labeled based on keywords in the title and body:
 ### Issue Labeler - How It Works
 
 The issue labeler runs automatically when an issue is:
+
 - Opened
 - Edited
 
@@ -50,6 +52,7 @@ It uses a GitHub Actions script to scan the issue title and body for relevant ke
 ## Manual Label Management
 
 While most labels are applied automatically, maintainers can still:
+
 - Add additional labels manually
 - Remove auto-applied labels if incorrect
 - Create custom labels for special cases
@@ -77,5 +80,6 @@ To modify the labeling rules:
 3. Test changes by creating a PR or issue
 
 For more information on the labeler syntax, see:
+
 - [actions/labeler documentation](https://github.com/actions/labeler)
 - [GitHub Actions documentation](https://docs.github.com/en/actions)

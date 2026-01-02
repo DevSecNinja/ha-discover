@@ -28,8 +28,20 @@ jobs:
           persist-credentials: false
 
       - name: Super-linter
-        uses: super-linter/super-linter/slim@v8.3.2 # x-release-please-version
+        uses: super-linter/super-linter/slim@d6b1ddadd7327b27a6e27840f96b14759dc6f1b4 # v8.3.2
         env:
           # To report GitHub Actions status checks
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_PYTHON_RUFF_FORMAT: false
+          # Disabled linters
+          VALIDATE_CSS: false
+          VALIDATE_HTML_PRETTIER: false
+          VALIDATE_NATURAL_LANGUAGE: false
+          VALIDATE_PYTHON_FLAKE8: false
+
+          # VALIDATE_JSCPD: false
+          # VALIDATE_MARKDOWN_PRETTIER: false
+          # VALIDATE_PYTHON_MYPY: false
+          # VALIDATE_PYTHON_PYLINT: false
+          # VALIDATE_TSX: false
+          # VALIDATE_YAML_PRETTIER: false

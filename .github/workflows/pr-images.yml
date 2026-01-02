@@ -13,8 +13,6 @@ on:
 
 permissions:
   contents: read
-  packages: write
-  pull-requests: write
 
 env:
   REGISTRY: ghcr.io
@@ -28,6 +26,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Get PR version
         id: get_version
@@ -36,6 +36,8 @@ jobs:
           echo "$OUTPUT" >> $GITHUB_OUTPUT
 
   build-and-push-backend:
+    permissions:
+      packages: write
     needs: [determine-version]
     uses: ./.github/workflows/build-and-push-image.yml
     with:
@@ -47,6 +49,8 @@ jobs:
       is_prerelease: true
 
   build-and-push-frontend:
+    permissions:
+      packages: write
     needs: [determine-version]
     uses: ./.github/workflows/build-and-push-image.yml
     with:
@@ -60,11 +64,15 @@ jobs:
         NEXT_PUBLIC_API_URL=/api/v1
 
   comment-on-pr:
+    permissions:
+      pull-requests: write
     needs: [determine-version, build-and-push-backend, build-and-push-frontend]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Comment PR with image tags
         uses: actions/github-script@v8

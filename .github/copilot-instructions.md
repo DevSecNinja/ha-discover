@@ -62,13 +62,13 @@ pip install --upgrade pip && pip install -r requirements.txt
 
 **deploy.yml**: Runs 40 backend pytest tests (Python 3.14), builds frontend static export (Node 24). Deployment commented out.
 
-**release.yml**: On version tags (v*.*.*), runs tests, builds/pushes Docker images to GHCR, creates GitHub release.
+**release.yml**: On version tags (v*.*.\*), runs tests, builds/pushes Docker images to GHCR, creates GitHub release.
 
 **CI Requirements**: All 40 backend tests pass, Docker containers build and pass health checks, API endpoints return expected responses.
 
 ## Project Structure
 
-``` text
+```text
 backend/app/: main.py (FastAPI), cli.py (index-now cmd), version.py, api/routes.py,
   models/ (SQLAlchemy), services/ (github_service.py, parser.py, indexer.py, search_service.py)
 backend/tests/: 40 pytest tests

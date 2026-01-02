@@ -141,7 +141,7 @@ This is ideal for:
 
 ## 🛠️ Project Structure
 
-``` text
+```text
 backend/
 ├── app/
 │   ├── main.py           # FastAPI application
