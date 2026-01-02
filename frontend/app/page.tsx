@@ -954,7 +954,7 @@ export default function Home() {
                         >
                           📦 Repositories
                         </h3>
-                        <div className="space-y-2 pb-1">
+                        <div className="space-y-2 pb-1 max-h-[300px] overflow-y-auto">
                           {facets.repositories.map((repo) => {
                             const repoKey = `${repo.owner}/${repo.name}`;
                             const isSelected = selectedRepo === repoKey;
@@ -1093,7 +1093,7 @@ export default function Home() {
                         >
                           🎨 Blueprints
                         </h3>
-                        <div className="space-y-2 pb-1">
+                        <div className="space-y-2 pb-1 max-h-[300px] overflow-y-auto">
                           {facets.blueprints.map((blueprint) => {
                             const isSelected =
                               selectedBlueprint === blueprint.path;
@@ -1209,7 +1209,7 @@ export default function Home() {
                         >
                           ⚡ Triggers
                         </h3>
-                        <div className="space-y-2 pb-1">
+                        <div className="space-y-2 pb-1 max-h-[300px] overflow-y-auto">
                           {facets.triggers.map((trigger) => {
                             const isSelected = selectedTrigger === trigger.type;
                             return (
@@ -1321,7 +1321,7 @@ export default function Home() {
                         >
                           🎬 Actions
                         </h3>
-                        <div className="space-y-2 pb-1">
+                        <div className="space-y-2 pb-1 max-h-[300px] overflow-y-auto">
                           {facets.actions.map((action) => {
                             const isSelected = selectedAction === action.call;
                             return (
