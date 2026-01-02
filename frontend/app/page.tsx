@@ -207,10 +207,8 @@ export default function Home() {
   // Re-run search when filters change
   // biome-ignore lint/correctness/useExhaustiveDependencies: Filter changes should trigger search
   useEffect(() => {
-    setCurrentPage(1); // Reset to page 1 when filters change
     performSearch(query, 1);
   }, [selectedRepo, selectedBlueprint, selectedTrigger]);
-
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setCurrentPage(1); // Reset to page 1 on new search
