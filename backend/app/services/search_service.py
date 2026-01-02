@@ -507,8 +507,7 @@ class SearchService:
                     for trigger, count in trigger_facets
                 ],
                 "actions": [
-                    {"call": action, "count": count}
-                    for action, count in action_facets
+                    {"call": action, "count": count} for action, count in action_facets
                 ],
             }
 

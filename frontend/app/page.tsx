@@ -776,7 +776,10 @@ export default function Home() {
                     }}
                   >
                     {/* Active Filters */}
-                    {(selectedRepo || selectedBlueprint || selectedTrigger || selectedAction) && (
+                    {(selectedRepo ||
+                      selectedBlueprint ||
+                      selectedTrigger ||
+                      selectedAction) && (
                       <div
                         className="pb-4 border-b"
                         style={{

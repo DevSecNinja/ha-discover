@@ -167,7 +167,12 @@ async def search_automations(
     )
 
     facets = SearchService.get_facets(
-        db, q, repo_filter=repo, blueprint_filter=blueprint, trigger_filter=trigger, action_filter=action
+        db,
+        q,
+        repo_filter=repo,
+        blueprint_filter=blueprint,
+        trigger_filter=trigger,
+        action_filter=action,
     )
 
     return {"query": q, "results": results, "count": len(results), "facets": facets}
