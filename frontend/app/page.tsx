@@ -1565,102 +1565,107 @@ export default function Home() {
             )}
             
             {/* Pagination Controls */}
-            {!loading && results.length > 0 && totalResults > perPage && (
-              <div
-                className="mt-8 flex justify-center items-center gap-4 rounded-2xl backdrop-blur-xl p-6"
-                style={{
-                  background: isDark
-                    ? "rgba(25, 25, 40, 0.6)"
-                    : "rgba(255, 255, 255, 0.8)",
-                  border: isDark
-                    ? "1px solid rgba(255, 255, 255, 0.08)"
-                    : "1px solid rgba(0, 0, 0, 0.08)",
-                }}
-              >
-                <button
-                  type="button"
-                  onClick={() => {
-                    const newPage = currentPage - 1;
-                    performSearch(query, newPage);
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-                  }}
-                  disabled={currentPage === 1}
-                  className="px-4 py-2 rounded-xl font-medium transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
-                  style={{
-                    background: isDark
-                      ? "rgba(255, 255, 255, 0.1)"
-                      : "rgba(0, 0, 0, 0.06)",
-                    color: isDark ? "#e0e7ff" : "#1f2937",
-                    border: isDark
-                      ? "1px solid rgba(255, 255, 255, 0.1)"
-                      : "1px solid rgba(0, 0, 0, 0.1)",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (currentPage > 1) {
-                      e.currentTarget.style.background = isDark
-                        ? "rgba(255, 255, 255, 0.15)"
-                        : "rgba(0, 0, 0, 0.1)";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = isDark
-                      ? "rgba(255, 255, 255, 0.1)"
-                      : "rgba(0, 0, 0, 0.06)";
-                  }}
-                >
-                  ← Previous
-                </button>
-
+            {!loading && results.length > 0 && totalResults > perPage && (() => {
+              const totalPages = Math.ceil(totalResults / perPage);
+              return (
                 <div
-                  className="flex items-center gap-2"
-                  style={{
-                    color: isDark ? "rgba(255, 255, 255, 0.7)" : "rgba(0, 0, 0, 0.7)",
-                  }}
-                >
-                  <span className="font-medium">
-                    Page {currentPage} of {Math.ceil(totalResults / perPage)}
-                  </span>
-                  <span className="opacity-50">•</span>
-                  <span className="text-sm">
-                    {totalResults} total result{totalResults !== 1 ? "s" : ""}
-                  </span>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    const newPage = currentPage + 1;
-                    performSearch(query, newPage);
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-                  }}
-                  disabled={currentPage >= Math.ceil(totalResults / perPage)}
-                  className="px-4 py-2 rounded-xl font-medium transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="mt-8 flex justify-center items-center gap-4 rounded-2xl backdrop-blur-xl p-6"
                   style={{
                     background: isDark
-                      ? "rgba(255, 255, 255, 0.1)"
-                      : "rgba(0, 0, 0, 0.06)",
-                    color: isDark ? "#e0e7ff" : "#1f2937",
+                      ? "rgba(25, 25, 40, 0.6)"
+                      : "rgba(255, 255, 255, 0.8)",
                     border: isDark
-                      ? "1px solid rgba(255, 255, 255, 0.1)"
-                      : "1px solid rgba(0, 0, 0, 0.1)",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (currentPage < Math.ceil(totalResults / perPage)) {
-                      e.currentTarget.style.background = isDark
-                        ? "rgba(255, 255, 255, 0.15)"
-                        : "rgba(0, 0, 0, 0.1)";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = isDark
-                      ? "rgba(255, 255, 255, 0.1)"
-                      : "rgba(0, 0, 0, 0.06)";
+                      ? "1px solid rgba(255, 255, 255, 0.08)"
+                      : "1px solid rgba(0, 0, 0, 0.08)",
                   }}
                 >
-                  Next →
-                </button>
-              </div>
-            )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newPage = currentPage - 1;
+                      performSearch(query, newPage);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    disabled={currentPage === 1}
+                    aria-label="Go to previous page"
+                    className="px-4 py-2 rounded-xl font-medium transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                    style={{
+                      background: isDark
+                        ? "rgba(255, 255, 255, 0.1)"
+                        : "rgba(0, 0, 0, 0.06)",
+                      color: isDark ? "#e0e7ff" : "#1f2937",
+                      border: isDark
+                        ? "1px solid rgba(255, 255, 255, 0.1)"
+                        : "1px solid rgba(0, 0, 0, 0.1)",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (currentPage > 1) {
+                        e.currentTarget.style.background = isDark
+                          ? "rgba(255, 255, 255, 0.15)"
+                          : "rgba(0, 0, 0, 0.1)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = isDark
+                        ? "rgba(255, 255, 255, 0.1)"
+                        : "rgba(0, 0, 0, 0.06)";
+                    }}
+                  >
+                    ← Previous
+                  </button>
+
+                  <div
+                    className="flex items-center gap-2"
+                    style={{
+                      color: isDark ? "rgba(255, 255, 255, 0.7)" : "rgba(0, 0, 0, 0.7)",
+                    }}
+                  >
+                    <span className="font-medium">
+                      Page {currentPage} of {totalPages}
+                    </span>
+                    <span className="opacity-50">•</span>
+                    <span className="text-sm">
+                      {totalResults} total result{totalResults !== 1 ? "s" : ""}
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newPage = currentPage + 1;
+                      performSearch(query, newPage);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    disabled={currentPage >= totalPages}
+                    aria-label="Go to next page"
+                    className="px-4 py-2 rounded-xl font-medium transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                    style={{
+                      background: isDark
+                        ? "rgba(255, 255, 255, 0.1)"
+                        : "rgba(0, 0, 0, 0.06)",
+                      color: isDark ? "#e0e7ff" : "#1f2937",
+                      border: isDark
+                        ? "1px solid rgba(255, 255, 255, 0.1)"
+                        : "1px solid rgba(0, 0, 0, 0.1)",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (currentPage < totalPages) {
+                        e.currentTarget.style.background = isDark
+                          ? "rgba(255, 255, 255, 0.15)"
+                          : "rgba(0, 0, 0, 0.1)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = isDark
+                        ? "rgba(255, 255, 255, 0.1)"
+                        : "rgba(0, 0, 0, 0.06)";
+                    }}
+                  >
+                    Next →
+                  </button>
+                </div>
+              );
+            })()}
           </div>
         </div>
 

@@ -362,3 +362,35 @@ def test_pagination_with_search_query(test_db):
     results, total = SearchService.search_automations(test_db, "Light", page=2, per_page=20)
     assert len(results) == 5
     assert total == 25
+
+
+def test_pagination_out_of_range_page(test_db):
+    """Test pagination with page number beyond available pages."""
+    repo = Repository(
+        name="test-repo",
+        owner="testuser",
+        description="Test repository",
+        url="https://github.com/testuser/test-repo",
+    )
+    test_db.add(repo)
+    test_db.commit()
+
+    # Create 25 automations
+    for i in range(25):
+        automation = Automation(
+            alias=f"Test Automation {i}",
+            description="Test description",
+            trigger_types="state",
+            source_file_path="automations.yaml",
+            github_url="https://github.com/testuser/test-repo/blob/main/automations.yaml",
+            repository_id=repo.id,
+        )
+        test_db.add(automation)
+    test_db.commit()
+
+    # Request page 100 (well beyond the 1 page available with 30 per page)
+    results, total = SearchService.search_automations(test_db, "", page=100, per_page=30)
+    
+    # Should return empty results but correct total count
+    assert len(results) == 0
+    assert total == 25
