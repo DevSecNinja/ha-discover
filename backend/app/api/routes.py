@@ -151,8 +151,8 @@ async def search_automations(
         page = 1
     if per_page > 100:
         per_page = 100
-    if per_page < 1:
-        per_page = 1
+    if per_page < 10:
+        per_page = 10
 
     results, total = SearchService.search_automations(
         db,
