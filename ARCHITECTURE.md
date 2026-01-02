@@ -124,7 +124,7 @@ id, key (unique), value, updated_at
 
 **Returns**: `{"status": "healthy"}`
 
-**CORS**: Allows `localhost:3000`, `localhost:8080`, `hadiscover.com`, `www.hadiscover.com`, `api.hadiscover.com`
+**CORS**: Allows `localhost:8080` and `hadiscover.com`
 
 ## Key Design Decisions
 
