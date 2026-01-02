@@ -270,14 +270,61 @@ export default function Home() {
     }
   };
 
+  // JSON-LD structured data for SEO
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "hadiscover",
+    description:
+      "Search engine for discovering Home Assistant automations from the community",
+    url: "https://hadiscover.com",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: "https://hadiscover.com/?q={search_term_string}",
+      },
+      "query-input": "required name=search_term_string",
+    },
+    provider: {
+      "@type": "Organization",
+      name: "DevSecNinja",
+      url: "https://github.com/DevSecNinja",
+    },
+  };
+
+  const softwareApplicationJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "hadiscover",
+    applicationCategory: "SearchApplication",
+    operatingSystem: "Web",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+    },
+    description:
+      "Search and explore powerful Home Assistant automations from the community. Find triggers, actions, and blueprints shared on GitHub.",
+    url: "https://hadiscover.com",
+    author: {
+      "@type": "Person",
+      name: "DevSecNinja",
+      url: "https://github.com/DevSecNinja",
+    },
+  };
+
   return (
-    <div
-      className="min-h-screen relative overflow-hidden"
-      style={{
-        backgroundColor: isDark ? "transparent" : "#ffffff",
-      }}
-    >
-      {/* Theme Toggle Button */}
+    <>
+      {/* JSON-LD structured data is now intended to be rendered from a server component
+          (e.g., layout.tsx) to ensure it is included in the initial HTML response. */}
+      <div
+        className="min-h-screen relative overflow-hidden"
+        style={{
+          backgroundColor: isDark ? "transparent" : "#ffffff",
+        }}
+      >
+        {/* Theme Toggle Button */}
       <button
         type="button"
         onClick={toggleTheme}
@@ -2257,6 +2304,7 @@ Here's my automation YAML:
           )}
         </footer>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
