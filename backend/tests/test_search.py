@@ -880,21 +880,21 @@ def test_filter_by_action_domain(test_db):
     test_db.commit()
 
     # Filter by light domain
-    results = SearchService.search_automations(
+    results, total = SearchService.search_automations(
         test_db, "", limit=10, action_domain_filter="light"
     )
     assert len(results) == 1
     assert results[0]["alias"] == "Light automation"
 
     # Filter by media_player domain
-    results = SearchService.search_automations(
+    results, total = SearchService.search_automations(
         test_db, "", limit=10, action_domain_filter="media_player"
     )
     assert len(results) == 1
     assert results[0]["alias"] == "Media automation"
 
     # Filter by notify domain
-    results = SearchService.search_automations(
+    results, total = SearchService.search_automations(
         test_db, "", limit=10, action_domain_filter="notify"
     )
     assert len(results) == 1
