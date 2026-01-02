@@ -72,6 +72,7 @@ jobs:
 
   build-and-push-backend:
     permissions:
+      contents: read
       packages: write
     needs: [test, determine-version]
     uses: ./.github/workflows/build-and-push-image.yml
@@ -98,6 +99,7 @@ jobs:
 
   build-and-push-frontend:
     permissions:
+      contents: read
       packages: write
     needs: [test, determine-version]
     uses: ./.github/workflows/build-and-push-image.yml
