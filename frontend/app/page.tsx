@@ -1329,7 +1329,7 @@ export default function Home() {
                         >
                           🔧 Action Domains
                         </h3>
-                        <div className="space-y-2 pb-1">
+                        <div className="space-y-2 pb-1 max-h-[300px] overflow-y-auto">
                           {facets.action_domains.map((actionDomain) => {
                             const isSelected =
                               selectedActionDomain === actionDomain.domain;
