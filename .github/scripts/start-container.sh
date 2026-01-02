@@ -17,9 +17,10 @@ fi
 
 echo "Starting container $CONTAINER_NAME from image $IMAGE_TAG..."
 
+# shellcheck disable=SC2086
 docker run -d --name "$CONTAINER_NAME" \
 	-p "$PORT_MAPPING" \
-	"$ADDITIONAL_ARGS" \
+	$ADDITIONAL_ARGS \
 	"$IMAGE_TAG"
 
 echo "✓ Container $CONTAINER_NAME started"
