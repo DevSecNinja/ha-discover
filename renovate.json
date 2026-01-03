@@ -12,7 +12,24 @@
   ],
   "prConcurrentLimit": 5,
   "prHourlyLimit": 2,
+  "docker": {
+    "enabled": true,
+    "pinDigests": true
+  },
+  "github-actions": {
+    "enabled": true,
+    "pinDigests": true
+  },
+  "pre-commit": {
+    "enabled": true
+  },
   "packageRules": [
+    {
+      "description": "Group pre-commit hooks updates",
+      "matchManagers": ["pre-commit"],
+      "groupName": "pre-commit hooks",
+      "automerge": true
+    },
     {
       "description": "Group Python dependencies",
       "matchManagers": ["pip_requirements"],
