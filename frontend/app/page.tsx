@@ -195,7 +195,7 @@ export default function Home() {
     }
   };
 
-  const performSearch = async (searchQuery: string, page: number = 1) => {
+  const performSearch = async (searchQuery: string, page = 1) => {
     setLoading(true);
     try {
       const params = new URLSearchParams();

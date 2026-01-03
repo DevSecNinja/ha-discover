@@ -1,3 +1,4 @@
+/* eslint-env node */
 /**
  * Comment on PR with Docker image pull commands
  * This script is used by the pr-images workflow to post a comment with Docker image details
