@@ -132,8 +132,9 @@ Some dependencies are detected but may not always receive automatic updates:
 - **Examples**:
   - `ghcr.io/devsecninja/hadiscover/backend:latest`
   - `ghcr.io/devsecninja/hadiscover/frontend:latest`
-- **Status**: Renovate detects but cannot suggest updates for `latest` tags
-- **Recommendation**: Consider using specific version tags for production deployments
+- **Status**: Renovate is configured to suggest pinning to specific version tags
+- **Configuration**: A package rule matches these images and will create PRs to replace `:latest` with versioned tags
+- **Note**: Renovate will automatically detect available versions and suggest upgrades from `:latest` to specific version tags (e.g., `v1.0.0`)
 
 ### Previously Untracked (Now Fixed)
 
@@ -159,6 +160,8 @@ To ensure Renovate can properly track and update dependencies:
 
 1. **GitHub Actions**: Use version tags (`@v1`, `@v1.2.3`) instead of commit SHAs or branch names
 2. **Docker Images**: Use specific version tags instead of `latest` for production
+   - Renovate is configured to automatically suggest replacing `:latest` tags with versioned tags
+   - When versioned tags are available, Renovate will create PRs to pin to specific versions
 3. **Pre-commit Hooks**: Keep `additional_dependencies` versions in sync with main hook versions
 4. **Lock Files**: Let Renovate handle lock file maintenance automatically (enabled with automerge)
 
