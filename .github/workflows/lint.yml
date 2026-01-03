@@ -3,7 +3,12 @@ name: Lint
 
 on: # yamllint disable-line rule:truthy
   workflow_dispatch: null
-  pull_request: null
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
 
 permissions: {}
 
