@@ -178,8 +178,8 @@ class CacheService:
     async def set_facets(self, filters: dict, data: dict, ttl: int = 600):
         """Cache facet results for 10 minutes"""
     
-    async def get_search_results(self, query: str, filters: dict, page: int):
-        """Get cached search results or None"""
+    async def get_search_results(self, query: str, filters: dict, page: int) -> Optional[dict]:
+        """Get cached search results or None if not found"""
     
     async def invalidate_all(self):
         """Clear all caches (called on indexing)"""
@@ -241,7 +241,7 @@ Expected improvement: Consistently under 5ms response time
 ### Environment Variables
 ```env
 # Redis Configuration
-REDIS_ENABLED=true
+REDIS_ENABLED=true  # Set to 'true' or 'false' as string
 REDIS_URL=redis://localhost:6379
 REDIS_DB=0
 REDIS_MAX_CONNECTIONS=50
@@ -254,7 +254,7 @@ CACHE_TTL_STATS=300         # 5 minutes
 CACHE_TTL_RATELIMIT=60      # 1 minute
 
 # Rate Limiting
-RATELIMIT_ENABLED=true
+RATELIMIT_ENABLED=true  # Set to 'true' or 'false' as string
 RATELIMIT_REQUESTS=100      # requests per window
 RATELIMIT_WINDOW=60         # seconds
 ```
