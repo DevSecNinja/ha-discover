@@ -74,6 +74,21 @@ jobs:
           labels: |
             org.opencontainers.image.vendor=DevSecNinja
 
+      - name: Validate context path
+        env:
+          CONTEXT_PATH: ${{ inputs.context_path }}
+        run: |
+          # Validate context_path to prevent code injection
+          case "${CONTEXT_PATH}" in
+            "./backend"|"./frontend")
+              echo "Valid context path: ${CONTEXT_PATH}"
+              ;;
+            *)
+              echo "Error: Invalid context path '${CONTEXT_PATH}'. Must be './backend' or './frontend'"
+              exit 1
+              ;;
+          esac
+
       - name: Update version
         env:
           UPDATE_VERSION_SCRIPT: ${{ inputs.update_version_script }}
@@ -82,9 +97,11 @@ jobs:
 
       - name: Build and push Docker image
         id: docker_build
+        env:
+          CONTEXT_PATH: ${{ inputs.context_path }}
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6
         with:
-          context: ${{ inputs.context_path }}
+          context: ${{ env.CONTEXT_PATH }} # zizmor: ignore[template-injection] Have added validation above.
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
