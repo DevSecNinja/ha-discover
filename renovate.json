@@ -65,16 +65,6 @@
       "automerge": true
     },
     {
-      "description": "Pin Docker images using latest tag to versioned tags",
-      "matchDatasources": ["docker"],
-      "matchPackageNames": [
-        "ghcr.io/devsecninja/hadiscover/backend",
-        "ghcr.io/devsecninja/hadiscover/frontend"
-      ],
-      "matchCurrentVersion": "!/^v?[0-9]+/",
-      "enabled": true
-    },
-    {
       "description": "Group GitHub Actions updates",
       "matchManagers": ["github-actions"],
       "groupName": "GitHub Actions",
