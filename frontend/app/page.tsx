@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 interface Repository {
   name: string;
@@ -136,9 +136,6 @@ export default function Home() {
     () => Math.ceil(totalResults / perPage),
     [totalResults, perPage],
   );
-
-  // Ref for scrolling to results
-  const resultsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Load theme preference from localStorage
@@ -1549,7 +1546,7 @@ export default function Home() {
           )}
 
           {/* Results */}
-          <div className="space-y-4 flex-1" ref={resultsRef}>
+          <div className="space-y-4 flex-1">
             {loading ? (
               <div className="text-center py-20">
                 <div
@@ -1907,10 +1904,7 @@ export default function Home() {
                   onClick={() => {
                     const newPage = currentPage - 1;
                     performSearch(query, newPage);
-                    resultsRef.current?.scrollIntoView({
-                      behavior: "smooth",
-                      block: "start",
-                    });
+                    window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
                   disabled={currentPage === 1}
                   aria-label="Go to previous page"
@@ -1962,10 +1956,7 @@ export default function Home() {
                   onClick={() => {
                     const newPage = currentPage + 1;
                     performSearch(query, newPage);
-                    resultsRef.current?.scrollIntoView({
-                      behavior: "smooth",
-                      block: "start",
-                    });
+                    window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
                   disabled={currentPage >= totalPages}
                   aria-label="Go to next page"
