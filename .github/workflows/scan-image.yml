@@ -44,12 +44,20 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Pull Docker image for scanning
-        run: .github/scripts/pull-docker-image.sh "${{ inputs.registry }}" "${{ inputs.image_name }}" "${{ inputs.digest }}"
+        env:
+          REGISTRY: ${{ inputs.registry }}
+          IMAGE_NAME: ${{ inputs.image_name }}
+          DIGEST: ${{ inputs.digest }}
+        run: .github/scripts/pull-docker-image.sh "${REGISTRY}" "${IMAGE_NAME}" "${DIGEST}"
 
       - name: Generate lowercase image ref
         id: image_ref
+        env:
+          REGISTRY: ${{ inputs.registry }}
+          IMAGE_NAME: ${{ inputs.image_name }}
+          DIGEST: ${{ inputs.digest }}
         run: |
-          OUTPUT="$(.github/scripts/generate-lowercase-image-ref.sh "${{ inputs.registry }}" "${{ inputs.image_name }}" "${{ inputs.digest }}")"
+          OUTPUT="$(.github/scripts/generate-lowercase-image-ref.sh "${REGISTRY}" "${IMAGE_NAME}" "${DIGEST}")"
           echo "$OUTPUT" >> "$GITHUB_OUTPUT"
 
       - name: Run Trivy vulnerability scanner
