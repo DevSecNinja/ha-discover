@@ -41,6 +41,12 @@ jobs:
           flags: backend
           name: backend-coverage
 
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
   test-backend:
     runs-on: ubuntu-latest
     steps:
