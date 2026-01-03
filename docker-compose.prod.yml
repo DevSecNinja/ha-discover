@@ -3,7 +3,7 @@
 
 services:
   api:
-    image: ghcr.io/devsecninja/hadiscover/backend:latest@sha256:feaf3183dd3076827d69ee359daaada490393e46426d24979c58faa8a0decb01
+    image: ghcr.io/devsecninja/hadiscover/backend:latest@sha256:7daa79ec1b01cc17bc619d3848f5c4f78d6879d38a4ba3ab68e96517fe3db860
     container_name: api
     ports:
       - "8000:8000"
