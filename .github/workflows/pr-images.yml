@@ -75,8 +75,10 @@ jobs:
           persist-credentials: false
 
       - name: Comment PR with image tags
+        env:
+          VERSION: ${{ needs.determine-version.outputs.version }}
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         with:
           script: |
             const script = require('./.github/scripts/comment-pr-images.js');
-            await script({ github, context, version: '${{ needs.determine-version.outputs.version }}' });
+            await script({ github, context, version: process.env.VERSION });
