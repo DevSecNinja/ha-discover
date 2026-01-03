@@ -1,5 +1,13 @@
 # hadiscover
 
+[![Release](https://github.com/DevSecNinja/hadiscover/actions/workflows/release.yml/badge.svg)](https://github.com/DevSecNinja/hadiscover/actions/workflows/release.yml)
+[![codecov](https://codecov.io/gh/DevSecNinja/hadiscover/graph/badge.svg?token=4V189H55CG)](https://codecov.io/gh/DevSecNinja/hadiscover)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Docker](https://img.shields.io/badge/docker-ready-blue?logo=docker)](https://github.com/DevSecNinja?tab=packages&repo_name=hadiscover)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.128+-green.svg?logo=fastapi)](https://fastapi.tiangolo.com)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org/)
+
 A search engine for discovering Home Assistant automations shared on GitHub.
 
 [Try it now at hadiscover.com](https://hadiscover.com/)
@@ -127,7 +135,7 @@ OpenAPI/Swagger docs available at <http://localhost:8000/docs> once running.
 ## More Information
 
 - **Architecture**: See [ARCHITECTURE.md](./ARCHITECTURE.md) for technical details
-- **Contributing**: PRs welcome! Open an issue for bugs or feature requests. PRs are automatically labeled based on changed files—see [.github/LABELING.md](./.github/LABELING.md) for details
+- **Contributing**: PRs welcome! Open an issue for bugs or feature requests.
 - **License**: MIT License
 - **Stack**: FastAPI (Python), Next.js (TypeScript), SQLite
 - **Inspired by**: [kubesearch.dev](https://kubesearch.dev)
