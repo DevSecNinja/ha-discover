@@ -130,6 +130,7 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
   const [perPage] = useState(15); // Fixed at 15 per requirement
+  const [shouldScrollToTop, setShouldScrollToTop] = useState(false);
 
   // Calculate total pages for pagination
   const totalPages = useMemo(
@@ -234,6 +235,14 @@ export default function Home() {
     // Load initial results
     performSearch("");
   }, []);
+
+  // Scroll to top after pagination changes and results are loaded
+  useEffect(() => {
+    if (shouldScrollToTop && !loading) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setShouldScrollToTop(false);
+    }
+  }, [shouldScrollToTop, loading]);
 
   // Re-run search when filters change
   // biome-ignore lint/correctness/useExhaustiveDependencies: Filter changes should trigger search
@@ -1903,8 +1912,8 @@ export default function Home() {
                   type="button"
                   onClick={() => {
                     const newPage = currentPage - 1;
+                    setShouldScrollToTop(true);
                     performSearch(query, newPage);
-                    window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
                   disabled={currentPage === 1}
                   aria-label="Go to previous page"
@@ -1955,8 +1964,8 @@ export default function Home() {
                   type="button"
                   onClick={() => {
                     const newPage = currentPage + 1;
+                    setShouldScrollToTop(true);
                     performSearch(query, newPage);
-                    window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
                   disabled={currentPage >= totalPages}
                   aria-label="Go to next page"
