@@ -32,9 +32,9 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
       - name: Bandit Scanner
-        uses: DevSecNinja/python-bandit-scan@v1.0.1
+        uses: DevSecNinja/python-bandit-scan@62d16066d02e3669359cd9b25f079d249f608c4d # v1.0.1
         with: # optional arguments
           # exit with 0, even with results found
           exit_zero: true # optional, default is DEFAULT
