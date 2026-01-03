@@ -172,13 +172,13 @@ REDIS_SOCKET_TIMEOUT=5
 
 ```python
 class CacheService:
-    async def get_facets(self, filters: dict) -> Optional[dict]:
+    async def get_facets(self, filters: Optional[dict] = None) -> Optional[dict]:
         """Get cached facets or None if not found"""
     
-    async def set_facets(self, filters: dict, data: dict, ttl: int = 600):
+    async def set_facets(self, filters: Optional[dict], data: dict, ttl: int = 600):
         """Cache facet results for 10 minutes"""
     
-    async def get_search_results(self, query: str, filters: dict, page: int) -> Optional[dict]:
+    async def get_search_results(self, query: str, filters: Optional[dict] = None, page: int = 1) -> Optional[dict]:
         """Get cached search results or None if not found"""
     
     async def invalidate_all(self):
@@ -241,7 +241,7 @@ Expected improvement: Consistently under 5ms response time
 ### Environment Variables
 ```env
 # Redis Configuration
-REDIS_ENABLED="true"  # Boolean values as strings: "true" or "false"
+REDIS_ENABLED=true  # Use string comparison: os.getenv("REDIS_ENABLED", "false") == "true"
 REDIS_URL=redis://localhost:6379
 REDIS_DB=0
 REDIS_MAX_CONNECTIONS=50
@@ -254,7 +254,7 @@ CACHE_TTL_STATS=300         # 5 minutes
 CACHE_TTL_RATELIMIT=60      # 1 minute
 
 # Rate Limiting
-RATELIMIT_ENABLED="true"  # Boolean values as strings: "true" or "false"
+RATELIMIT_ENABLED=true  # Use string comparison: os.getenv("RATELIMIT_ENABLED", "false") == "true"
 RATELIMIT_REQUESTS=100      # requests per window
 RATELIMIT_WINDOW=60         # seconds
 ```
