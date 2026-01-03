@@ -33,7 +33,7 @@ jobs:
         id: get_version
         run: |
           OUTPUT="$(.github/scripts/extract-version.sh "pull_request" "${{ github.event.pull_request.number }}" "")"
-          echo "$OUTPUT" >> $GITHUB_OUTPUT
+          echo "$OUTPUT" >> "$GITHUB_OUTPUT"
 
   build-and-push-backend:
     permissions:

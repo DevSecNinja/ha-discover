@@ -62,7 +62,7 @@ jobs:
           GIT_REF: ${{ github.ref }}
         run: |
           OUTPUT="$(.github/scripts/extract-version.sh "$EVENT_NAME" "" "$GIT_REF")"
-          echo "$OUTPUT" >> $GITHUB_OUTPUT
+          echo "$OUTPUT" >> "$GITHUB_OUTPUT"
 
           # Extract version for validation
           VERSION=$(echo "$OUTPUT" | grep "^version=" | cut -d= -f2)
@@ -76,7 +76,7 @@ jobs:
           VERSION: ${{ steps.get_version.outputs.version }}
         run: |
           OUTPUT="$(.github/scripts/check-if-prerelease.sh "$VERSION" "")"
-          echo "$OUTPUT" >> $GITHUB_OUTPUT
+          echo "$OUTPUT" >> "$GITHUB_OUTPUT"
 
   build-and-push-backend:
     permissions:

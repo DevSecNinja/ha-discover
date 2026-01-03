@@ -50,7 +50,7 @@ jobs:
         id: image_ref
         run: |
           OUTPUT="$(.github/scripts/generate-lowercase-image-ref.sh "${{ inputs.registry }}" "${{ inputs.image_name }}" "${{ inputs.digest }}")"
-          echo "$OUTPUT" >> $GITHUB_OUTPUT
+          echo "$OUTPUT" >> "$GITHUB_OUTPUT"
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # 0.33.1
