@@ -394,18 +394,24 @@ export default function Home() {
         <header className="text-center mb-16 pt-8">
           {/* Logo */}
           <div className="mb-8 flex justify-center">
-            <Image
-              src="/logo.png"
-              alt="hadiscover logo"
-              width={120}
-              height={106}
-              priority
-              style={{
-                filter: isDark
-                  ? "drop-shadow(0 4px 12px rgba(18, 188, 242, 0.3))"
-                  : "drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15))",
-              }}
-            />
+            <a
+              href="/"
+              className="inline-block cursor-pointer transition-transform hover:scale-105"
+              aria-label="Go to homepage"
+            >
+              <Image
+                src="/logo.png"
+                alt="hadiscover logo"
+                width={120}
+                height={106}
+                priority
+                style={{
+                  filter: isDark
+                    ? "drop-shadow(0 4px 12px rgba(18, 188, 242, 0.3))"
+                    : "drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15))",
+                }}
+              />
+            </a>
           </div>
 
           <h1 className="text-7xl sm:text-8xl font-bold mb-6 tracking-tight">
