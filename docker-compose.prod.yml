@@ -29,7 +29,7 @@ services:
       start_period: 5s
 
   web:
-    image: ghcr.io/devsecninja/hadiscover/frontend:latest@sha256:62d2d80309e5c18972fac99f11ab7d72b96b1ad8fbe07fdf212f6c87d3558572
+    image: ghcr.io/devsecninja/hadiscover/frontend:latest@sha256:7e1a72ca56279dcc8275e00fa0db672e1bc466b77ae0fc6e6d9cc19b230ac3c0
     container_name: web
     ports:
       - "8080:80"
