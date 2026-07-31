@@ -26,7 +26,7 @@ jobs:
       security-events: write
     with:
       # renovate: datasource=github-releases depName=jdx/mise
-      mise-version: "2026.7.5"
+      mise-version: "2026.7.7"
       lint-dprint: false
       lint-yamlfmt: false
       lint-yamllint: false
