@@ -107,6 +107,8 @@ GitHub API
 
 ## Database Schema
 
+A visual schema diagram is automatically generated on each push to main when models change. Download it from the workflow artifacts at [Actions > Generate Database Schema Diagram](../../actions/workflows/schema-diagram.yml).
+
 ### repositories
 
 ```sql
