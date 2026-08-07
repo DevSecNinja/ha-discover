@@ -1,0 +1,61 @@
+---
+name: Schema Diagram
+
+on: # yamllint disable-line rule:truthy
+  workflow_dispatch: null
+  push:
+    branches:
+      - main
+    paths:
+      - "backend/app/models/**"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "backend/app/models/**"
+
+permissions:
+  contents: read
+
+jobs:
+  schema-diagram:
+    name: Generate Schema Diagram
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          persist-credentials: false
+
+      - name: Setup Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6
+        with:
+          python-version: "3.14"
+          cache: "pip"
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install backend dependencies
+        run: .github/scripts/install-backend-deps.sh
+
+      - name: Create sample database
+        run: ../.github/scripts/create-sample-db.sh "${{ github.workspace }}/hadiscover.db"
+        working-directory: backend
+
+      - name: Generate schema diagram
+        uses: schemacrawler/SchemaCrawler-Action@v17.6.0
+        with:
+          entrypoint: /schemacrawler.sh
+          args: >
+            --server=sqlite
+            --database=hadiscover.db
+            --info-level=standard
+            --command=schema
+            --output-file schema-diagram.png
+            --log-level CONFIG
+
+      - name: Upload schema diagram
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: schema-diagram
+          path: schema-diagram.png
